@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Selling Platform - Kinetic Tech Prototype</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            justify-content: flex-start; /* Align content to top for header */
+            padding-top: 100px;
+        }
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            max-width: 600px;
+            opacity: 0.8;
+        }
+        .hero button {
+            background-color: #00e0b3;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .hero button:hover {
+            background-color: #00c49a;
+        }
+        .section-title {
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #333;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -15px;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #2575fc;
+            border-radius: 2px;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+        .category-card, .product-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .category-card:hover, .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+        .category-card h3, .product-card h3 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #2575fc;
+        }
+        .category-card p, .product-card p {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #666;
+        }
+        .how-it-works-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+        }
+        .step-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            max-width: 280px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .step-card h4 {
+            font-size: 1.3em;
+            color: #6a11cb;
+            margin-top: 15px;
+        }
+        .step-card p {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .step-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2575fc;
+            margin-bottom: 10px;
+        }
+        .testimonial-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            font-style: italic;
+            color: #555;
+            line-height: 1.8;
+        }
+        .testimonial-card strong {
+            display: block;
+            margin-top: 15px;
+            font-style: normal;
+            color: #333;
+        }
+        footer {
+            background-color: #222;
+            color: #aaa;
+            padding: 60px 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #00e0b3;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Kinetic Enhancements (via animations.jsx later) will target these elements */
+        .animated-element {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+    <!-- Assumptions:
+        - This is a single-page scrolling prototype, focusing on a "cinematic" flow.
+        - Content will be focused on AI and Design tools as requested.
+        - Kinetic Tech (Locomotive style) implies subtle but impactful scroll-based animations.
+        - Initial styling is minimal, focusing on layout and readability for early feedback.
+        - React will be used for component-based structure and managing animations.
+    -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Reasoning: Including animations.jsx contents here for a self-contained prototype
+        // This is a placeholder for the actual animations.jsx from huashu-design
+        // For now, we define simple animated components for structure.
+        const useScrollReveal = (ref, options = {}) => {
+            const [isVisible, setIsVisible] = React.useState(false);
+
+            React.useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                        observer.unobserve(entry.target); // Observe once
+                    }
+                }, options);
+
+                if (ref.current) {
+                    observer.observe(ref.current);
+                }
+
+                return () => {
+                    if (ref.current) {
+                        observer.unobserve(ref.current);
+                    }
+                };
+            }, [ref, options]);
+
+            return isVisible;
+        };
+
+        const AnimatedSection = ({ children, className = '', delay = 0 }) => {
+            const ref = React.useRef(null);
+            const isVisible = useScrollReveal(ref, { threshold: 0.1 }); // Trigger when 10% visible
+
+            const animationStyle = {
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+                transition: `opacity 0.6s ease-out ${delay}s, transform 0.6s ease-out ${delay}s`,
+            };
+
+            return (
+                <div ref={ref} style={animationStyle} className={className}>
+                    {children}
+                </div>
+            );
+        };
+
+        const Hero = () => (
+            <section className="hero">
+                <div className="container">
+                    <AnimatedSection>
+                        <h1>Access Top AI & Design Tools, Simplified.</h1>
+                        <p>Unlock your creative and productive potential with premium subscriptions, delivered fast and securely.</p>
+                        <button>Explore Tools</button>
+                    </AnimatedSection>
+                </div>
+            </section>
+        );
+
+        const Categories = () => (
+            <section className="categories">
+                <div className="container">
+                    <AnimatedSection delay={0.1}>
+                        <h2 className="section-title">Explore by Category</h2>
+                    </AnimatedSection>
+                    <div className="category-grid">
+                        <AnimatedSection delay={0.2}>
+                            <div className="category-card">
+                                <h3>AI Tools & Automation</h3>
+                                <p>Supercharge your workflows with cutting-edge artificial intelligence solutions.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.3}>
+                            <div className="category-card">
+                                <h3>Creative Design Suites</h3>
+                                <p>Access industry-leading software for graphic design, video editing, and more.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.4}>
+                            <div className="category-card">
+                                <h3>Productivity Boosters</h3>
+                                <p>Streamline your tasks and manage projects efficiently with our curated selection.</p>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const FeaturedProducts = () => (
+            <section className="featured-products">
+                <div className="container">
+                    <AnimatedSection delay={0.1}>
+                        <h2 className="section-title">Featured Tools & Subscriptions</h2>
+                    </AnimatedSection>
+                    <div className="category-grid"> {/* Reusing category-grid for product layout */}
+                        {/* Placeholder Products */}
+                        <AnimatedSection delay={0.2}>
+                            <div className="product-card">
+                                <h3>ChatGPT Plus</h3>
+                                <p>Advanced AI conversational model for writing, coding, and more.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.3}>
+                            <div className="product-card">
+                                <h3>Midjourney Pro</h3>
+                                <p>Generate stunning images from text with powerful AI image generation.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.4}>
+                            <div className="product-card">
+                                <h3>Canva Pro</h3>
+                                <p>Unleash your creativity with professional design tools and templates.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.5}>
+                            <div className="product-card">
+                                <h3>Adobe Creative Cloud</h3>
+                                <p>The complete suite of creative desktop and mobile apps for design and video.</p>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const HowItWorks = () => (
+            <section className="how-it-works">
+                <div className="container">
+                    <AnimatedSection delay={0.1}>
+                        <h2 className="section-title">How It Works</h2>
+                    </AnimatedSection>
+                    <div className="how-it-works-steps">
+                        <AnimatedSection delay={0.2}>
+                            <div className="step-card">
+                                <div className="step-number">1</div>
+                                <h4>Choose Your Tool</h4>
+                                <p>Browse our catalog of premium AI and design subscriptions.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.3}>
+                            <div className="step-card">
+                                <div className="step-number">2</div>
+                                <h4>Place Your Order</h4>
+                                <p>Securely complete your purchase with local payment options.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.4}>
+                            <div className="step-card">
+                                <div className="step-number">3</div>
+                                <h4>Fast Delivery</h4>
+                                <p>Receive your subscription details or access code swiftly.</p>
+                            </div>
+                        </AnimatedSection>
+                        <AnimatedSection delay={0.5}>
+                            <div className="step-card">
+                                <div className="step-number">4</div>
+                                <h4>Enjoy & Create!</h4>
+                                <p>Activate your subscription and start using your new tools.</p>
+                            </div>
+                        </AnimatedSection>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const Testimonials = () => (
+            <section className="testimonials">
+                <div className="container">
+                    <AnimatedSection delay={0.1}>
+                        <h2 className="section-title">What Our Customers Say</h2>
+                    </AnimatedSection>
+                    <AnimatedSection delay={0.2}>
+                        <div className="testimonial-card">
+                            <p>"ShopinBD made accessing premium AI tools incredibly easy. Fast delivery and excellent support!"</p>
+                            <strong>— Satisfied User</strong>
+                        </div>
+                    </AnimatedSection>
+                </div>
+            </section>
+        );
+
+        const AppFooter = () => (
+            <footer>
+                <div className="container">
+                    <p>&copy; 2026 Subscription Platform. All rights reserved.</p>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Contact Us</a>
+                    </div>
+                </div>
+            </footer>
+        );
+
+        const App = () => (
+            <div>
+                <Hero />
+                <Categories />
+                <FeaturedProducts />
+                <HowItWorks />
+                <Testimonials />
+                <AppFooter />
+            </div>
+        );
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

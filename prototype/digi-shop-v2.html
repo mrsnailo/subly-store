@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiShop — Premium AI & Design Marketplace</title>
+    <!-- React & Babel for Huashu-Design Pipeline -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --accent: #00f2ff;
+            --accent-low: rgba(0, 242, 255, 0.1);
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: blur(12px);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Locomotive Scroll Simulation & Layout */
+        .viewport {
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 40px;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: var(--glass);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 6px;
+        }
+
+        /* Bento Grid Hero */
+        .hero-bento {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(2, 300px);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 120px auto 40px;
+        }
+
+        .bento-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: var(--glass);
+            transition: border-color 0.4s ease;
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent);
+        }
+
+        .hero-main {
+            grid-column: span 8;
+            grid-row: span 2;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-main h1 {
+            font-size: 64px;
+            margin: 0;
+            line-height: 0.9;
+            letter-spacing: -3px;
+        }
+
+        .hero-main p {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 400px;
+            margin: 24px 0;
+        }
+
+        .side-card {
+            grid-column: span 4;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* High-Density Product Grid */
+        .section-header {
+            max-width: 1400px;
+            margin: 80px auto 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-card:hover {
+            background: rgba(30, 30, 30, 0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--accent-low);
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .buy-btn {
+            background: white;
+            color: black;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1000px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-bento { display: block; }
+            .bento-card { margin-bottom: 20px; }
+            .hero-main h1 { font-size: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const useIntersection = (ref) => {
+            const [active, setActive] = useState(false);
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) setActive(true);
+                }, { threshold: 0.1 });
+                if (ref.current) observer.observe(ref.current);
+                return () => observer.disconnect();
+            }, []);
+            return active;
+        };
+
+        const ProductCard = ({ name, desc, price, icon, badge, delay }) => {
+            const ref = useRef();
+            const active = useIntersection(ref);
+            return (
+                <div ref={ref} className={`product-card reveal ${active ? 'active' : ''}`} style={{ transitionDelay: `${delay}ms` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div className="brand-icon">{icon}</div>
+                        <span className="badge">{badge}</span>
+                    </div>
+                    <div>
+                        <div style={{ fontWeight: 700, fontSize: '18px', marginBottom: '4px' }}>{name}</div>
+                        <div style={{ color: '#888', fontSize: '14px', lineHeight: 1.4 }}>{desc}</div>
+                    </div>
+                    <div className="price-row">
+                        <div className="price">৳{price}</div>
+                        <button className="buy-btn">Buy Now</button>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const heroRef = useRef();
+            const heroActive = useIntersection(heroRef);
+
+            return (
+                <div className="viewport">
+                    <header className="header">
+                        <div className="logo">
+                            <div className="logo-icon"></div>
+                            DIGISHOP
+                        </div>
+                        <div style={{ display: 'flex', gap: '32px', fontSize: '14px', fontWeight: 500 }}>
+                            <a style={{ color: 'white', textDecoration: 'none' }}>Marketplace</a>
+                            <a style={{ color: '#666', textDecoration: 'none' }}>AI Tools</a>
+                            <a style={{ color: '#666', textDecoration: 'none' }}>Design</a>
+                            <a style={{ color: '#666', textDecoration: 'none' }}>Support</a>
+                        </div>
+                    </header>
+
+                    <div className="hero-bento">
+                        <div ref={heroRef} className={`bento-card hero-main reveal ${heroActive ? 'active' : ''}`}>
+                            <span className="badge" style={{ width: 'fit-content' }}>Premium Access</span>
+                            <h1>Unleash<br/>Intelligence.</h1>
+                            <p>Premium AI tools and Design software, delivered instantly in Bangladesh. No dual-currency card required.</p>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button className="buy-btn" style={{ padding: '12px 24px' }}>Browse Catalog</button>
+                                <button style={{ background: 'transparent', color: 'white', border: '1px solid #333', padding: '12px 24px', borderRadius: '8px' }}>How it works</button>
+                            </div>
+                        </div>
+                        <div className={`bento-card side-card reveal ${heroActive ? 'active' : ''}`} style={{ transitionDelay: '200ms' }}>
+                            <div style={{ fontSize: '24px', fontWeight: 700 }}>20,000+</div>
+                            <div style={{ color: '#666' }}>Trusted Users</div>
+                        </div>
+                        <div className={`bento-card side-card reveal ${heroActive ? 'active' : ''}`} style={{ transitionDelay: '400ms', background: 'var(--accent)', color: 'black' }}>
+                            <div style={{ fontSize: '24px', fontWeight: 700 }}>⚡ Instant</div>
+                            <div style={{ fontWeight: 600 }}>WhatsApp Delivery</div>
+                        </div>
+                    </div>
+
+                    <div className="section-header">
+                        <div>
+                            <h2 style={{ fontSize: '32px', margin: 0 }}>AI Ecosystem</h2>
+                            <p style={{ color: '#666', margin: '8px 0 0 0' }}>The world's most powerful models at your fingertips.</p>
+                        </div>
+                        <a style={{ color: var(--accent), fontSize: '14px', textDecoration: 'none' }}>View All →</a>
+                    </div>
+
+                    <div className="grid">
+                        <ProductCard name="ChatGPT Plus" desc="Full GPT-4o access with DALL-E and Advanced Data Analysis." price="2,450" icon="GPT" badge="Private Email" delay={100} />
+                        <ProductCard name="Claude 3.5 Sonnet" desc="The smartest AI for coding and nuanced writing tasks." price="2,800" icon="C" badge="Shared" delay={200} />
+                        <ProductCard name="Midjourney Pro" desc="Unlimited image generation with stealth mode enabled." price="3,200" icon="MJ" badge="Verified" delay={300} />
+                        <ProductCard name="Perplexity Pro" desc="Your personal AI research assistant for real-time search." price="1,800" icon="P" badge="1 Year" delay={400} />
+                    </div>
+
+                    <div className="section-header">
+                        <div>
+                            <h2 style={{ fontSize: '32px', margin: 0 }}>Design & Creative</h2>
+                            <p style={{ color: '#666', margin: '8px 0 0 0' }}>Industry standard tools for professional creators.</p>
+                        </div>
+                    </div>
+
+                    <div className="grid" style={{ marginBottom: '100px' }}>
+                        <ProductCard name="Canva Pro" desc="Millions of templates, premium stock, and magic tools." price="450" icon="Cv" badge="Team Invite" delay={100} />
+                        <ProductCard name="Adobe Creative Cloud" desc="All 20+ apps including Photoshop, Illustrator, and Premiere." price="1,500" icon="Ps" badge="4 Months" delay={200} />
+                        <ProductCard name="CapCut Pro" desc="Advanced video editing features and premium templates." price="800" icon="Cc" badge="Auto-Update" delay={300} />
+                        <ProductCard name="Figma Pro" desc="Collaborative interface design tool for modern teams." price="1,200" icon="F" badge="Private" delay={400} />
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

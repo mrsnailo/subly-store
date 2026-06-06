@@ -1,0 +1,78 @@
+// Subly — subscription store schema
+// Owner manages Categories and Products (with duration/price tiers) from the admin panel.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A single owner/admin account that can log into the admin panel.
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// Subscription category, e.g. "AI Tools", "Streaming". Owner can add / reorder.
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  emoji     String? // optional icon shown on the pill
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([sortOrder])
+}
+
+/// A purchasable subscription product belonging to a category.
+model Product {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique
+  tagline    String // short descriptor, e.g. "GPT-4o · DALL·E · advanced"
+  wordmark   String // brand wordmark text shown on the card
+  brandColor String   @default("#14151A") // wordmark colour
+  brandBg    String   @default("#EDEAE1") // card header background
+  rating     Float    @default(4.8)
+  badgeText  String? // e.g. "Hot", "-50%"
+  badgeKind  String? // "hot" | "save"
+  isFeatured Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  durations Duration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([sortOrder])
+}
+
+/// A price tier for a product: a duration label with current and optional "was" price (BDT).
+model Duration {
+  id        String  @id @default(cuid())
+  label     String // e.g. "1 mo", "3 mo", "1 yr"
+  price     Int // current price in BDT (whole taka)
+  wasPrice  Int? // optional strike-through price
+  sortOrder Int     @default(0)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
