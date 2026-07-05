@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "../lib/env";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
@@ -80,8 +81,8 @@ function slugify(s: string) {
 
 async function main() {
   // ── Admin user ──
-  const email = process.env.ADMIN_EMAIL ?? "owner@subly.shop";
-  const password = process.env.ADMIN_PASSWORD ?? "subly-admin-123";
+  const email = process.env.ADMIN_EMAIL!;
+  const password = process.env.ADMIN_PASSWORD!;
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.adminUser.upsert({
     where: { email },
