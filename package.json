@@ -11,7 +11,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:local": "bash scripts/test.sh"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
