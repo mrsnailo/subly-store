@@ -15,6 +15,17 @@ export async function authenticate(
     });
   } catch (error) {
     if (error instanceof AuthError) {
+      const errMessage = (error.cause as any)?.err?.message || error.message || "";
+      const isThrottled =
+        (error as any).code === "throttled" ||
+        errMessage.includes("Too many") ||
+        errMessage.includes("throttled") ||
+        error.type?.includes("throttled");
+
+      if (isThrottled) {
+        return errMessage || "Too many failed login attempts. Please try again later.";
+      }
+
       if (error.type === "CredentialsSignin") {
         return "Invalid email or password.";
       }
