@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { prisma } from "../lib/prisma";
+import { getStoreSettings } from "../lib/queries";
+import { sanitizeWhatsAppNumber, getWhatsAppLink } from "../lib/format";
 
 describe("StoreSettings Model", () => {
   beforeAll(async () => {
@@ -65,4 +67,54 @@ describe("StoreSettings Model", () => {
       })
     ).rejects.toThrow();
   });
+
+  describe("getStoreSettings helper", () => {
+    it("should return configured store settings if they exist", async () => {
+      const dbSettings = await prisma.storeSettings.findFirst();
+      expect(dbSettings).not.toBeNull();
+
+      const settings = await getStoreSettings();
+      expect(settings.storeName).toBe(dbSettings!.storeName);
+      expect(settings.contactEmail).toBe(dbSettings!.contactEmail);
+      expect(settings.whatsApp).toBe(dbSettings!.whatsApp);
+      expect(settings.currency).toBe(dbSettings!.currency);
+      expect(settings.isOpen).toBe(dbSettings!.isOpen);
+    });
+
+    it("should return fallback settings if DB has no settings", async () => {
+      // Temporarily store existing settings
+      const existing = await prisma.storeSettings.findMany();
+      await prisma.storeSettings.deleteMany();
+
+      try {
+        const settings = await getStoreSettings();
+        expect(settings.storeName).toBe("Subly Store");
+        expect(settings.contactEmail).toBe("owner@subly.shop");
+        expect(settings.whatsApp).toBe("+8801700000000");
+        expect(settings.isOpen).toBe(true);
+      } finally {
+        // Restore settings
+        if (existing.length > 0) {
+          await prisma.storeSettings.createMany({ data: existing });
+        }
+      }
+    });
+  });
+
+  describe("WhatsApp Sanitizer Helpers", () => {
+    it("should sanitize WhatsApp number correctly", () => {
+      expect(sanitizeWhatsAppNumber("+8801700000000")).toBe("8801700000000");
+      expect(sanitizeWhatsAppNumber("008801700000000")).toBe("8801700000000");
+      expect(sanitizeWhatsAppNumber("+00-880-1700-0000")).toBe("88017000000");
+      expect(sanitizeWhatsAppNumber("123-456 789")).toBe("123456789");
+    });
+
+    it("should generate deep links correctly", () => {
+      expect(getWhatsAppLink("+8801700000000")).toBe("https://wa.me/8801700000000");
+      expect(getWhatsAppLink("008801700000000", "Hello there!")).toBe(
+        "https://wa.me/8801700000000?text=Hello%20there!"
+      );
+    });
+  });
 });
+

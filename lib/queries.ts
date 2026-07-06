@@ -77,3 +77,35 @@ export async function getStorefront(): Promise<{
 
   return { categories: cats, products };
 }
+
+export type StoreSettingsData = {
+  storeName: string;
+  contactEmail: string;
+  whatsApp: string;
+  currency: string;
+  logoUrl: string | null;
+  isOpen: boolean;
+};
+
+/** Retrieves the global store settings (first row). Returns a fallback default if none exists. */
+export async function getStoreSettings(): Promise<StoreSettingsData> {
+  const settings = await prisma.storeSettings.findFirst();
+  if (settings) {
+    return {
+      storeName: settings.storeName,
+      contactEmail: settings.contactEmail,
+      whatsApp: settings.whatsApp,
+      currency: settings.currency,
+      logoUrl: settings.logoUrl,
+      isOpen: settings.isOpen,
+    };
+  }
+  return {
+    storeName: "Subly Store",
+    contactEmail: "owner@subly.shop",
+    whatsApp: "+8801700000000",
+    currency: "BDT",
+    logoUrl: "/logo.svg",
+    isOpen: true,
+  };
+}
