@@ -3,28 +3,21 @@ export function bdt(n: number): string {
   return "৳" + n.toLocaleString("en-IN");
 }
 
-/**
- * Sanitizes a phone number for use in a WhatsApp wa.me link by:
- * 1. Stripping all non-digit characters.
- * 2. Dropping leading "00" if present.
- */
+/** Strip non-digits and drop leading 00 from WhatsApp numbers. */
 export function sanitizeWhatsAppNumber(num: string): string {
-  let sanitized = num.replace(/\D/g, "");
-  if (sanitized.startsWith("00")) {
-    sanitized = sanitized.slice(2);
+  let digits = num.replace(/\D/g, "");
+  if (digits.startsWith("00")) {
+    digits = digits.slice(2);
   }
-  return sanitized;
+  return digits;
 }
 
-/**
- * Builds a WhatsApp wa.me deep link for the given number and optional text message.
- */
+/** Build a wa.me deep link from a raw WhatsApp number and optional pre-filled text. */
 export function getWhatsAppLink(num: string, text?: string): string {
-  const cleanNum = sanitizeWhatsAppNumber(num);
-  const base = `https://wa.me/${cleanNum}`;
+  const digits = sanitizeWhatsAppNumber(num);
+  if (!digits) return "#";
   if (text) {
-    return `${base}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
   }
-  return base;
+  return `https://wa.me/${digits}`;
 }
-

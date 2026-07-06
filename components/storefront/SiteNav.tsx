@@ -2,7 +2,7 @@
 
 import { useCart } from "@/components/cart/CartProvider";
 
-export function SiteNav() {
+export function SiteNav({ storeName = "Subly" }: { storeName?: string }) {
   const { count, openCart } = useCart();
   return (
     <header className="site">
@@ -12,7 +12,7 @@ export function SiteNav() {
             <span className="mark">
               <span />
             </span>
-            Subly
+            {storeName}
           </a>
           <div className="navlinks">
             <a href="#shop">All Subscriptions</a>

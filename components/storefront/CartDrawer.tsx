@@ -3,7 +3,7 @@
 import { useCart } from "@/components/cart/CartProvider";
 import { bdt } from "@/lib/format";
 
-export function CartDrawer() {
+export function CartDrawer({ isOpenStore = true }: { isOpenStore?: boolean }) {
   const { items, subtotal, isOpen, closeCart, removeItem } = useCart();
 
   return (
@@ -61,8 +61,12 @@ export function CartDrawer() {
             <span>Total</span>
             <span>{bdt(subtotal)}</span>
           </div>
-          <button className="btn btn-ink" disabled={items.length === 0}>
-            Checkout with bKash →
+          <button
+            className="btn btn-ink"
+            disabled={items.length === 0 || !isOpenStore}
+            style={!isOpenStore ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+          >
+            {isOpenStore ? "Checkout with bKash →" : "Store Closed"}
           </button>
           <p className="note">🔒 Secure · Replacement warranty on all plans</p>
         </div>
