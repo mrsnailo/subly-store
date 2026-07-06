@@ -91,6 +91,24 @@ async function main() {
   });
   console.log(`✓ Admin user ready: ${email}`);
 
+  // ── Store settings ──
+  const settingsCount = await prisma.storeSettings.count();
+  if (settingsCount === 0) {
+    await prisma.storeSettings.create({
+      data: {
+        storeName: "Subly Store",
+        contactEmail: "owner@subly.shop",
+        whatsApp: "+8801700000000",
+        currency: "BDT",
+        logoUrl: "/logo.svg",
+        isOpen: true,
+      },
+    });
+    console.log("✓ Default store settings populated");
+  } else {
+    console.log("✓ Store settings already exist, skipping settings seed");
+  }
+
   // ── Categories + products + durations ──
   // Clear product graph for a clean re-seed (leaves admin user intact).
   await prisma.duration.deleteMany();
