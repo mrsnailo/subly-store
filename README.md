@@ -101,14 +101,16 @@ Prisma Client is generated dynamically during the deployment build.
 
 ### 2. Environment Variables
 
-Configure the following environment variables in your Vercel Project Settings under **Settings > Environment Variables**:
+The application enforces a **fail-fast environment validation mechanism**. At startup, it verifies the presence of all required environment variables and throws a clear error listing any that are missing. This validation is bypassed during the Next.js production build (`phase-production-build`) to allow building/packaging without production secrets.
 
-| Variable | Scope | Description / Value |
-| --- | --- | --- |
-| `DATABASE_URL` | Production & Preview | The connection string for your PostgreSQL database (e.g. Neon, Supabase, AWS RDS). |
-| `AUTH_SECRET` | Production & Preview | A secure random string used by NextAuth to sign and encrypt cookies. Generate with `openssl rand -base64 33`. |
-| `ADMIN_EMAIL` | Optional | Custom email for the admin owner account (used during database seeding). Defaults to `owner@subly.shop`. |
-| `ADMIN_PASSWORD` | Optional | Custom password for the admin owner account. Defaults to `subly-admin-123`. |
+Configure the following environment variables in your environment, `.env` file, or Vercel Project Settings under **Settings > Environment Variables**:
+
+| Variable | Scope | Status | Description / Value |
+| --- | --- | --- | --- |
+| `DATABASE_URL` | Production & Preview | **Required** | The connection string for your PostgreSQL database (e.g. Neon, Supabase, AWS RDS). |
+| `AUTH_SECRET` | Production & Preview | **Required** | A secure random string used by NextAuth to sign and encrypt cookies. Generate with `openssl rand -base64 33`. |
+| `ADMIN_EMAIL` | Production & Preview | **Required** | Custom email for the admin owner account (used during database seeding). |
+| `ADMIN_PASSWORD` | Production & Preview | **Required** | Custom password for the admin owner account. |
 
 > [!IMPORTANT]
 > **Database Connection Pooling in Serverless Environments:**
@@ -139,3 +141,4 @@ Vercel builds do not run migrations or database seeding automatically. To prepar
 - Brand wordmarks are honest text placeholders (per the prototype) — swap in
   licensed brand SVGs for production.
 - Rotate `AUTH_SECRET` and the admin password before deploying.
+- Refer to the [Production Environment Checklist](docs/production-checklist.md) for comprehensive deployment guidelines.
