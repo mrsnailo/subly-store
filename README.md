@@ -80,15 +80,31 @@ npm run dev            # http://localhost:3000
 | ------------------ | ----------------- |
 | `owner@subly.shop` | `subly-admin-123` |
 
+## Testing
+
+Tests are **hermetic** — they need no `.env` and no pre-existing database. The
+runner provisions a throwaway Postgres in Docker, applies migrations, runs the
+suite, and tears the container down:
+
+```bash
+npm run test:local     # requires Docker; provisions its own Postgres
+```
+
+Non-secret test config lives in the committed `.env.test`. CI does not use this
+runner — the CI workflow supplies its own Postgres service and runs `npm test`
+directly. Running `npm test` yourself on a fresh clone will fail fast with a
+message pointing you back to `npm run test:local`.
+
 ## Scripts
 
-| Script               | Purpose                                   |
-| -------------------- | ----------------------------------------- |
-| `npm run dev`        | Dev server                                |
-| `npm run build`      | Production build                          |
-| `npm run db:migrate` | `prisma migrate dev`                      |
-| `npm run db:seed`    | Seed admin + catalogue (resets catalogue) |
-| `npm run db:studio`  | Prisma Studio                             |
+| Script                | Purpose                                            |
+| --------------------- | -------------------------------------------------- |
+| `npm run dev`         | Dev server                                         |
+| `npm run build`       | Production build                                   |
+| `npm run test:local`  | Hermetic test suite (throwaway Docker Postgres)    |
+| `npm run db:migrate`  | `prisma migrate dev`                               |
+| `npm run db:seed`     | Seed admin + catalogue (resets catalogue)          |
+| `npm run db:studio`   | Prisma Studio                                      |
 
 ## How to deploy to Vercel
 
