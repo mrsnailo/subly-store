@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin", label: "Dashboard", icon: "▣" },
   { href: "/admin/categories", label: "Categories", icon: "🗂️" },
   { href: "/admin/products", label: "Products", icon: "📦" },
+  { href: "/admin/settings", label: "Settings", icon: "⚙️" },
 ];
 
 export function Sidebar({ ownerName }: { ownerName: string }) {

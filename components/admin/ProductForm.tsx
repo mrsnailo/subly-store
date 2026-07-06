@@ -225,7 +225,7 @@ export function ProductForm({
       <div className="field">
         <label>Duration &amp; price tiers</label>
         <span className="hint" style={{ marginBottom: 4 }}>
-          Prices are in BDT (৳). &quot;Was&quot; is the optional strike-through price.
+          Prices use your store currency. &quot;Was&quot; is the optional strike-through price.
         </span>
         <div className="dur-row" style={{ marginBottom: 4 }}>
           <span className="hint">Label</span>

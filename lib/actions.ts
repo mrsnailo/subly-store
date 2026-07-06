@@ -17,6 +17,7 @@ function revalidateAll() {
   revalidatePath("/admin");
   revalidatePath("/admin/categories");
   revalidatePath("/admin/products");
+  revalidatePath("/admin/settings");
 }
 
 async function uniqueSlug(
