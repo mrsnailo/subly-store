@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/components/cart/CartProvider";
 import { bdt } from "@/lib/format";
 import type { StoreCategory, StoreProduct } from "@/lib/queries";
+import { getCategoryCover } from "@/lib/category-covers";
 
 function ProductCard({ product, isOpen = true }: { product: StoreProduct; isOpen?: boolean }) {
   const { addItem } = useCart();
@@ -103,16 +104,21 @@ export function Shop({
           >
             All
           </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              className={`pill ${active === c.slug ? "active" : ""}`}
-              onClick={() => setActive(c.slug)}
-            >
-              {c.emoji ? `${c.emoji} ` : ""}
-              {c.name}
-            </button>
-          ))}
+          {categories.map((c) => {
+            const cover = getCategoryCover(c.coverKey, c.slug);
+            return (
+              <button
+                key={c.id}
+                className={`pill ${active === c.slug ? "active" : ""}`}
+                onClick={() => setActive(c.slug)}
+              >
+                <span className="mini" aria-hidden="true">
+                  {cover.svg}
+                </span>
+                {c.name}
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid">

@@ -44,6 +44,7 @@ async function uniqueSlug(
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required").max(60),
   emoji: z.string().max(8).optional().or(z.literal("")),
+  coverKey: z.string().optional().or(z.literal("")),
   isActive: z.boolean().optional(),
 });
 
@@ -52,6 +53,7 @@ export async function createCategory(formData: FormData) {
   const data = categorySchema.parse({
     name: formData.get("name"),
     emoji: formData.get("emoji") ?? "",
+    coverKey: formData.get("coverKey") ?? "",
     isActive: formData.get("isActive") === "on",
   });
 
@@ -61,6 +63,7 @@ export async function createCategory(formData: FormData) {
       name: data.name,
       slug: await uniqueSlug("category", data.name),
       emoji: data.emoji || null,
+      coverKey: data.coverKey || null,
       isActive: data.isActive ?? true,
       sortOrder: (max._max.sortOrder ?? -1) + 1,
     },
@@ -73,6 +76,7 @@ export async function updateCategory(id: string, formData: FormData) {
   const data = categorySchema.parse({
     name: formData.get("name"),
     emoji: formData.get("emoji") ?? "",
+    coverKey: formData.get("coverKey") ?? "",
     isActive: formData.get("isActive") === "on",
   });
   await prisma.category.update({
@@ -81,6 +85,7 @@ export async function updateCategory(id: string, formData: FormData) {
       name: data.name,
       slug: await uniqueSlug("category", data.name, id),
       emoji: data.emoji || null,
+      coverKey: data.coverKey || null,
       isActive: data.isActive ?? false,
     },
   });

@@ -504,13 +504,16 @@ section.block {
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  padding: 9px 17px;
+  padding: 8px 16px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: #fff;
   cursor: pointer;
   transition: 0.16s;
   color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .pill:hover {
   border-color: var(--ink);
@@ -519,6 +522,26 @@ section.block {
   background: var(--ink);
   color: #fff;
   border-color: var(--ink);
+}
+.pill .mini {
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: rgba(20, 25, 40, 0.04);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.pill.active .mini {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.14);
+}
+.pill .mini svg {
+  width: 13px;
+  height: 13px;
+  display: block;
 }
 
 /* product grid */
