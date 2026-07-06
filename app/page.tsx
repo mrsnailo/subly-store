@@ -3,12 +3,14 @@ import { Shop } from "@/components/storefront/Shop";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { Toast } from "@/components/storefront/Toast";
 import { Faq } from "@/components/storefront/Faq";
-import { getStorefront } from "@/lib/queries";
+import { getStorefront, getStoreSettings } from "@/lib/queries";
+import { getWhatsAppLink } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const { categories, products } = await getStorefront();
+  const settings = await getStoreSettings();
   const serviceCount = products.length;
 
   return (
@@ -30,7 +32,15 @@ export default async function Home() {
         </div>
       </div>
 
-      <SiteNav />
+      {!settings.isOpen && (
+        <div style={{ background: "rgba(239, 68, 68, 0.15)", borderBottom: "1px solid rgba(239, 68, 68, 0.25)", padding: "10px 0", color: "#f87171", fontSize: "14px", fontWeight: 500, textAlign: "center" }}>
+          <div className="wrap">
+            🛑 <b>Store Temporarily Closed</b> — We are currently not accepting new orders. Cart checkout and WhatsApp ordering are disabled.
+          </div>
+        </div>
+      )}
+
+      <SiteNav storeName={settings.storeName} />
 
       {/* Hero */}
       <section className="hero">
@@ -165,7 +175,7 @@ export default async function Home() {
       </div>
 
       {/* Shop — dynamic from DB */}
-      <Shop categories={categories} products={products} />
+      <Shop categories={categories} products={products} isOpen={settings.isOpen} />
 
       {/* How it works */}
       <div id="how" className="how">
@@ -336,7 +346,7 @@ export default async function Home() {
                 <span className="mark">
                   <span />
                 </span>
-                Subly
+                {settings.storeName}
               </a>
               <p className="blurb">
                 Bangladesh&apos;s trusted store for premium digital
@@ -363,29 +373,35 @@ export default async function Home() {
               <a href="#">About us</a>
               <a href="#how">How it works</a>
               <a href="#">Reviews</a>
-              <a href="#">Contact</a>
+              <a href={`mailto:${settings.contactEmail}`}>Contact Us</a>
             </div>
             <div>
               <h5>Support</h5>
               <a href="#faq">FAQ</a>
-              <a href="#">WhatsApp</a>
+              <a href={getWhatsAppLink(settings.whatsApp, "Hi, I need support with my subscription.")} target="_blank" rel="noopener noreferrer">WhatsApp Support</a>
               <a href="#">Warranty policy</a>
               <a href="/admin">Admin</a>
             </div>
           </div>
           <div className="foot-bottom">
-            <span>© 2026 Subly. All rights reserved.</span>
-            <span>Made for Bangladesh 🇧🇩 · +880 1878 507054</span>
+            <span>© 2026 {settings.storeName}. All rights reserved.</span>
+            <span>Made for Bangladesh 🇧🇩 · {settings.whatsApp}</span>
           </div>
         </div>
       </footer>
 
       {/* Floating WhatsApp */}
-      <a className="wa" href="#">
-        💬 Order on WhatsApp
-      </a>
+      {settings.isOpen ? (
+        <a className="wa" href={getWhatsAppLink(settings.whatsApp, "Hi! I'd like to order a subscription.")} target="_blank" rel="noopener noreferrer">
+          💬 Order on WhatsApp
+        </a>
+      ) : (
+        <a className="wa" href="#" onClick={(e) => e.preventDefault()} style={{ opacity: 0.6, cursor: "not-allowed", background: "#4b5563" }}>
+          💬 Store Closed
+        </a>
+      )}
 
-      <CartDrawer />
+      <CartDrawer isOpenStore={settings.isOpen} />
       <Toast />
     </>
   );

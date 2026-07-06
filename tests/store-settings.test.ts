@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { prisma } from "../lib/prisma";
+import { getStoreSettings } from "../lib/queries";
 
 describe("StoreSettings Model", () => {
   beforeAll(async () => {
@@ -64,5 +65,32 @@ describe("StoreSettings Model", () => {
         } as any,
       })
     ).rejects.toThrow();
+  });
+
+  it("should return settings from DB or fallback if empty", async () => {
+    const fromDb = await getStoreSettings();
+    expect(fromDb.storeName).toBeDefined();
+
+    // Temporarily clear DB row
+    const original = await prisma.storeSettings.findFirst();
+    if (original) {
+      await prisma.storeSettings.delete({ where: { id: original.id } });
+      const fallback = await getStoreSettings();
+      expect(fallback.id).toBe("default-settings");
+      expect(fallback.storeName).toBe("Subly Store");
+
+      // Restore it
+      await prisma.storeSettings.create({
+        data: {
+          id: original.id,
+          storeName: original.storeName,
+          contactEmail: original.contactEmail,
+          whatsApp: original.whatsApp,
+          currency: original.currency,
+          logoUrl: original.logoUrl,
+          isOpen: original.isOpen,
+        },
+      });
+    }
   });
 });

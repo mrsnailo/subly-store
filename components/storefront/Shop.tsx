@@ -5,7 +5,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { bdt } from "@/lib/format";
 import type { StoreCategory, StoreProduct } from "@/lib/queries";
 
-function ProductCard({ product }: { product: StoreProduct }) {
+function ProductCard({ product, isOpen = true }: { product: StoreProduct; isOpen?: boolean }) {
   const { addItem } = useCart();
   const [sel, setSel] = useState(0);
   const d = product.durations[sel] ?? product.durations[0];
@@ -46,8 +46,10 @@ function ProductCard({ product }: { product: StoreProduct }) {
       </div>
       <button
         className="btn btn-ink add"
+        disabled={!isOpen}
+        style={!isOpen ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
         onClick={() =>
-          addItem({
+          isOpen && addItem({
             key: `${product.id}-${d.label}`,
             name: product.name,
             duration: d.label,
@@ -56,7 +58,7 @@ function ProductCard({ product }: { product: StoreProduct }) {
           })
         }
       >
-        ＋ Add to cart
+        {isOpen ? "＋ Add to cart" : "Store Closed"}
       </button>
     </div>
   );
@@ -65,9 +67,11 @@ function ProductCard({ product }: { product: StoreProduct }) {
 export function Shop({
   categories,
   products,
+  isOpen = true,
 }: {
   categories: StoreCategory[];
   products: StoreProduct[];
+  isOpen?: boolean;
 }) {
   const [active, setActive] = useState("all");
   const list =
@@ -115,7 +119,7 @@ export function Shop({
           {list.length === 0 ? (
             <div className="empty-grid">No subscriptions in this category yet.</div>
           ) : (
-            list.map((p) => <ProductCard key={p.id} product={p} />)
+            list.map((p) => <ProductCard key={p.id} product={p} isOpen={isOpen} />)
           )}
         </div>
       </div>
