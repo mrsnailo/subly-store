@@ -6,6 +6,7 @@ import {
   moveCategory,
 } from "@/lib/actions";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
+import { getCategoryCover } from "@/lib/category-covers";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ export default async function CategoriesPage() {
 
       <div className="formcard" style={{ marginBottom: 24 }}>
         <form action={createCategory}>
-          <div className="row3">
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.6fr 1.2fr auto", gap: 14, alignItems: "end" }}>
             <div className="field">
               <label htmlFor="name">Category name</label>
               <input
@@ -49,9 +50,30 @@ export default async function CategoriesPage() {
                 maxLength={4}
               />
             </div>
-            <div className="field" style={{ justifyContent: "flex-end" }}>
-              <label style={{ visibility: "hidden" }}>Add</label>
-              <button className="btn btn-ink" name="isActive" value="on">
+            <div className="field">
+              <label htmlFor="coverKey">
+                Cover Key <span className="hint">(optional)</span>
+              </label>
+              <select
+                id="coverKey"
+                name="coverKey"
+                className="select"
+                defaultValue=""
+              >
+                <option value="">Default (Folder icon)</option>
+                <option value="ai">AI Tools</option>
+                <option value="stream">Streaming</option>
+                <option value="music">Music</option>
+                <option value="design">Design</option>
+                <option value="work">Productivity</option>
+                <option value="security">Security</option>
+                <option value="gaming">Gaming</option>
+                <option value="education">Education</option>
+                <option value="tools">Utilities</option>
+              </select>
+            </div>
+            <div className="field">
+              <button className="btn btn-ink" name="isActive" value="on" style={{ height: 42 }}>
                 ＋ Add category
               </button>
             </div>
@@ -92,11 +114,28 @@ export default async function CategoriesPage() {
                     </form>
                   </div>
                 </td>
-                <td>
-                  <b>
-                    {c.emoji ? `${c.emoji} ` : ""}
-                    {c.name}
-                  </b>
+                <td style={{ verticalAlign: "middle" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      border: "1px solid var(--line)",
+                      background: "rgba(20, 25, 40, 0.03)",
+                      display: "grid",
+                      placeItems: "center",
+                      color: "var(--ink)",
+                      flexShrink: 0
+                    }}>
+                      <div style={{ width: 18, height: 18 }}>
+                        {getCategoryCover(c.coverKey, c.slug).svg}
+                      </div>
+                    </div>
+                    <div>
+                      <b style={{ display: "block" }}>{c.name}</b>
+                      {c.emoji && <span className="hint" style={{ fontSize: 12 }}>Emoji: {c.emoji}</span>}
+                    </div>
+                  </div>
                 </td>
                 <td style={{ color: "var(--muted)" }}>{c.slug}</td>
                 <td>{c._count.products}</td>

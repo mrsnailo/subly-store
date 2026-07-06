@@ -26,6 +26,7 @@ model Category {
   name      String
   slug      String    @unique
   emoji     String? // optional icon shown on the pill
+  coverKey  String? // optional category cover key matching local SVG asset
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
   products  Product[]

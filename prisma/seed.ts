@@ -21,11 +21,12 @@ type SeedProduct = {
   durations: SeedDuration[];
 };
 
-const CATEGORIES: { name: string; slug: string; emoji: string; products: SeedProduct[] }[] = [
+const CATEGORIES: { name: string; slug: string; emoji: string; coverKey: string; products: SeedProduct[] }[] = [
   {
     name: "AI Tools",
     slug: "ai",
     emoji: "🤖",
+    coverKey: "ai",
     products: [
       { name: "ChatGPT Plus", tagline: "GPT-4o · DALL·E · advanced", wordmark: "ChatGPT", brandColor: "#10A37F", brandBg: "#E7F6F1", rating: 4.9, badgeText: "Hot", badgeKind: "hot", featured: true, durations: [{ label: "1 mo", price: 299, wasPrice: 399 }, { label: "3 mo", price: 799, wasPrice: 1100 }, { label: "1 yr", price: 2899, wasPrice: 4799 }] },
       { name: "Claude Pro", tagline: "Opus · 5× usage limits", wordmark: "Claude", brandColor: "#D97757", brandBg: "#FBEEE8", rating: 4.9, durations: [{ label: "1 mo", price: 2490, wasPrice: 2900 }, { label: "3 mo", price: 6900, wasPrice: 8700 }] },
@@ -36,6 +37,7 @@ const CATEGORIES: { name: string; slug: string; emoji: string; products: SeedPro
     name: "Streaming",
     slug: "stream",
     emoji: "🎬",
+    coverKey: "stream",
     products: [
       { name: "Netflix Premium", tagline: "4K UHD · 4 screens", wordmark: "NETFLIX", brandColor: "#E50914", brandBg: "#FDE7E8", rating: 4.9, badgeText: "Hot", badgeKind: "hot", featured: true, durations: [{ label: "1 mo", price: 380, wasPrice: 550 }, { label: "3 mo", price: 1050, wasPrice: 1650 }, { label: "1 yr", price: 3800, wasPrice: 6600 }] },
       { name: "YouTube Premium", tagline: "Ad-free · background play", wordmark: "YouTube", brandColor: "#FF0000", brandBg: "#FDE7E7", rating: 4.8, durations: [{ label: "1 mo", price: 99, wasPrice: 189 }, { label: "1 yr", price: 990, wasPrice: 2268 }] },
@@ -46,6 +48,7 @@ const CATEGORIES: { name: string; slug: string; emoji: string; products: SeedPro
     name: "Music",
     slug: "music",
     emoji: "🎵",
+    coverKey: "music",
     products: [
       { name: "Spotify Premium", tagline: "Ad-free · offline music", wordmark: "Spotify", brandColor: "#1DB954", brandBg: "#E5F7EC", rating: 4.9, badgeText: "-55%", badgeKind: "save", featured: true, durations: [{ label: "1 mo", price: 179, wasPrice: 399 }, { label: "3 mo", price: 480, wasPrice: 1197 }, { label: "1 yr", price: 1399, wasPrice: 4788 }] },
     ],
@@ -54,6 +57,7 @@ const CATEGORIES: { name: string; slug: string; emoji: string; products: SeedPro
     name: "Design",
     slug: "design",
     emoji: "🎨",
+    coverKey: "design",
     products: [
       { name: "Canva Pro", tagline: "Premium templates · BG remover", wordmark: "Canva", brandColor: "#7D2AE8", brandBg: "#F1E9FC", rating: 4.8, badgeText: "Hot", badgeKind: "hot", durations: [{ label: "1 mo", price: 199, wasPrice: 399 }, { label: "1 yr", price: 299, wasPrice: 4490 }] },
       { name: "Adobe Creative Cloud", tagline: "All apps · Photoshop · Premiere", wordmark: "Adobe", brandColor: "#FA0F00", brandBg: "#FDE6E5", rating: 4.7, durations: [{ label: "1 mo", price: 990, wasPrice: 1490 }, { label: "1 yr", price: 9990, wasPrice: 14999 }] },
@@ -63,6 +67,7 @@ const CATEGORIES: { name: string; slug: string; emoji: string; products: SeedPro
     name: "Productivity",
     slug: "work",
     emoji: "💼",
+    coverKey: "work",
     products: [
       { name: "Microsoft 365", tagline: "Office + 1TB OneDrive", wordmark: "Microsoft", brandColor: "#0067B8", brandBg: "#E4EEF7", rating: 4.8, badgeText: "-40%", badgeKind: "save", durations: [{ label: "1 yr", price: 499, wasPrice: 980 }] },
       { name: "Grammarly Premium", tagline: "AI writing · tone · plagiarism", wordmark: "Grammarly", brandColor: "#15C39A", brandBg: "#E4F8F2", rating: 4.7, durations: [{ label: "1 mo", price: 99, wasPrice: 299 }, { label: "1 yr", price: 990, wasPrice: 6999 }] },
@@ -118,7 +123,7 @@ async function main() {
   let catOrder = 0;
   for (const cat of CATEGORIES) {
     const category = await prisma.category.create({
-      data: { name: cat.name, slug: cat.slug, emoji: cat.emoji, sortOrder: catOrder++ },
+      data: { name: cat.name, slug: cat.slug, emoji: cat.emoji, coverKey: cat.coverKey, sortOrder: catOrder++ },
     });
 
     let prodOrder = 0;

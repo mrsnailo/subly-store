@@ -27,7 +27,7 @@ export default async function EditCategoryPage({
 
       <div className="formcard">
         <form action={updateCategory.bind(null, category.id)}>
-          <div className="row2">
+          <div className="row3">
             <div className="field">
               <label htmlFor="name">Category name</label>
               <input
@@ -49,6 +49,28 @@ export default async function EditCategoryPage({
                 defaultValue={category.emoji ?? ""}
                 maxLength={4}
               />
+            </div>
+            <div className="field">
+              <label htmlFor="coverKey">
+                Cover Key <span className="hint">(optional)</span>
+              </label>
+              <select
+                id="coverKey"
+                name="coverKey"
+                className="select"
+                defaultValue={category.coverKey ?? ""}
+              >
+                <option value="">Default (Folder icon)</option>
+                <option value="ai">AI Tools</option>
+                <option value="stream">Streaming</option>
+                <option value="music">Music</option>
+                <option value="design">Design</option>
+                <option value="work">Productivity</option>
+                <option value="security">Security</option>
+                <option value="gaming">Gaming</option>
+                <option value="education">Education</option>
+                <option value="tools">Utilities</option>
+              </select>
             </div>
           </div>
           <label className="checkrow">

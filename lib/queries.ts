@@ -26,6 +26,7 @@ export type StoreCategory = {
   name: string;
   slug: string;
   emoji: string | null;
+  coverKey: string | null;
 };
 
 /** Active categories (ordered) + active products with their price tiers, for the storefront. */
@@ -50,6 +51,7 @@ export async function getStorefront(): Promise<{
     name: c.name,
     slug: c.slug,
     emoji: c.emoji,
+    coverKey: c.coverKey,
   }));
 
   const products: StoreProduct[] = categories.flatMap((c) =>
