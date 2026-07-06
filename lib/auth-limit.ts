@@ -56,16 +56,22 @@ export async function authorizeCredentials(raw: unknown) {
     throw new Error("Too many failed login attempts for this email. Please try again in 15 minutes.");
   }
 
-  const user = await prisma.adminUser.findUnique({ where: { email } });
-  if (!user) {
-    await prisma.loginAttempt.create({
-      data: { ip, email, success: false },
+  // Prune old attempt logs to keep database size stable
+  try {
+    await prisma.loginAttempt.deleteMany({
+      where: {
+        createdAt: { lt: windowStart },
+      },
     });
-    return null;
+  } catch (e) {
+    console.error("Failed to prune login attempts:", e);
   }
 
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) {
+  const dummyHash = "$2a$10$vI8aWBnW3fID.1Spke.rKe.uxb52.t2.C.0GfUXT8x4K5JmK8s6/y"; // Valid bcrypt hash
+  const user = await prisma.adminUser.findUnique({ where: { email } });
+
+  const ok = await bcrypt.compare(password, user?.passwordHash || dummyHash);
+  if (!user || !ok) {
     await prisma.loginAttempt.create({
       data: { ip, email, success: false },
     });
