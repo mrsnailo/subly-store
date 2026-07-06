@@ -1,7 +1,8 @@
 import "dotenv/config";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { prisma } from "../lib/prisma";
 import { getStoreSettings } from "../lib/queries";
+import { sanitizeWhatsAppNumber, getWhatsAppLink } from "../lib/format";
 
 describe("StoreSettings Model", () => {
   beforeAll(async () => {
@@ -92,5 +93,21 @@ describe("StoreSettings Model", () => {
         },
       });
     }
+  });
+
+  describe("WhatsApp Sanitizer Helpers", () => {
+    it("should sanitize WhatsApp number correctly", () => {
+      expect(sanitizeWhatsAppNumber("+8801700000000")).toBe("8801700000000");
+      expect(sanitizeWhatsAppNumber("008801700000000")).toBe("8801700000000");
+      expect(sanitizeWhatsAppNumber("+00-880-1700-0000")).toBe("88017000000");
+      expect(sanitizeWhatsAppNumber("123-456 789")).toBe("123456789");
+    });
+
+    it("should generate deep links correctly", () => {
+      expect(getWhatsAppLink("+8801700000000")).toBe("https://wa.me/8801700000000");
+      expect(getWhatsAppLink("008801700000000", "Hello there!")).toBe(
+        "https://wa.me/8801700000000?text=Hello%20there!"
+      );
+    });
   });
 });
