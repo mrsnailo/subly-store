@@ -77,3 +77,31 @@ export async function getStorefront(): Promise<{
 
   return { categories: cats, products };
 }
+
+export type StoreSettings = {
+  id: string;
+  storeName: string;
+  contactEmail: string;
+  whatsApp: string;
+  currency: string;
+  logoUrl: string | null;
+  isOpen: boolean;
+};
+
+export async function getStoreSettings(): Promise<StoreSettings> {
+  const settings = await prisma.storeSettings.findFirst({
+    orderBy: { createdAt: "asc" },
+  });
+  if (settings) {
+    return settings;
+  }
+  return {
+    id: "default-settings",
+    storeName: "Subly Store",
+    contactEmail: "owner@subly.shop",
+    whatsApp: "+8801700000000",
+    currency: "BDT",
+    logoUrl: "/logo.svg",
+    isOpen: true,
+  };
+}
