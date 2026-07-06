@@ -10,6 +10,23 @@ async function main() {
   const prisma = new PrismaClient({ adapter });
 
   const count = await prisma.category.count();
+
+  // Ensure default store settings exist even if full seed is skipped
+  const settingsCount = await prisma.storeSettings.count();
+  if (settingsCount === 0) {
+    await prisma.storeSettings.create({
+      data: {
+        storeName: "Subly Store",
+        contactEmail: "owner@subly.shop",
+        whatsApp: "+8801700000000",
+        currency: "BDT",
+        logoUrl: "/logo.svg",
+        isOpen: true,
+      },
+    });
+    console.log("✓ Default store settings populated (seed-if-empty)");
+  }
+
   await prisma.$disconnect();
 
   if (count > 0) {

@@ -89,3 +89,17 @@ model LoginAttempt {
   @@index([email, success, createdAt])
 }
 
+/// Global store settings (single-row settings model).
+model StoreSettings {
+  id           String   @id @default(cuid())
+  storeName    String
+  contactEmail String
+  whatsApp     String
+  currency     String   @default("BDT")
+  logoUrl      String? // logo reference
+  isOpen       Boolean  @default(true) // open/closed flag
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
