@@ -13,12 +13,7 @@ const REQUIRED_ENV_VARS = [
 export function validateEnv() {
   // Skip validation during the Next.js production build phase to allow building/packaging
   // without production secrets in CI/CD environments.
-  if (
-    process.env.NEXT_PHASE === "phase-production-build" ||
-    process.env.VITEST === "true" ||
-    process.env.NODE_ENV === "test" ||
-    process.env.CI === "true"
-  ) {
+  if (process.env.NEXT_PHASE === "phase-production-build" || process.env.VITEST === "true") {
     return;
   }
 
