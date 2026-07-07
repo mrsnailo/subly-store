@@ -57,82 +57,84 @@ export default async function ProductsPage() {
               No products in this category yet.
             </div>
           ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th style={{ width: 90 }}>Order</th>
-                  <th>Product</th>
-                  <th>Tiers</th>
-                  <th>From</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cat.products.map((p, i) => (
-                  <tr key={p.id}>
-                    <td>
-                      <div className="actions">
-                        <form action={moveProduct.bind(null, p.id, "up")}>
-                          <button className="iconlink" disabled={i === 0}>
-                            ↑
-                          </button>
-                        </form>
-                        <form action={moveProduct.bind(null, p.id, "down")}>
-                          <button
-                            className="iconlink"
-                            disabled={i === cat.products.length - 1}
-                          >
-                            ↓
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="brand-mini">
-                        <span className="wm" style={{ color: p.brandColor }}>
-                          {p.wordmark}
-                        </span>
-                        <span>
-                          <b>{p.name}</b>
-                          <br />
-                          <span style={{ color: "var(--muted)", fontSize: 12 }}>
-                            {p.tagline}
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 90 }}>Order</th>
+                    <th>Product</th>
+                    <th>Tiers</th>
+                    <th>From</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cat.products.map((p, i) => (
+                    <tr key={p.id}>
+                      <td>
+                        <div className="actions">
+                          <form action={moveProduct.bind(null, p.id, "up")}>
+                            <button className="iconlink" disabled={i === 0}>
+                              ↑
+                            </button>
+                          </form>
+                          <form action={moveProduct.bind(null, p.id, "down")}>
+                            <button
+                              className="iconlink"
+                              disabled={i === cat.products.length - 1}
+                            >
+                              ↓
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="brand-mini">
+                          <span className="wm" style={{ color: p.brandColor }}>
+                            {p.wordmark}
+                          </span>
+                          <span>
+                            <b>{p.name}</b>
+                            <br />
+                            <span style={{ color: "var(--muted)", fontSize: 12 }}>
+                              {p.tagline}
+                            </span>
                           </span>
                         </span>
-                      </span>
-                    </td>
-                    <td>{p.durations.length}</td>
-                    <td>
-                      {p.durations[0] ? bdt(p.durations[0].price) : "—"}
-                    </td>
-                    <td>
-                      <form action={toggleProduct.bind(null, p.id)}>
-                        <button
-                          className={`chip ${p.isActive ? "on" : "off"}`}
-                          style={{ border: 0, cursor: "pointer" }}
-                        >
-                          {p.isActive ? "Live" : "Hidden"}
-                        </button>
-                      </form>
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <div className="actions" style={{ justifyContent: "flex-end" }}>
-                        <a className="iconlink" href={`/admin/products/${p.id}`}>
-                          Edit
-                        </a>
-                        <ConfirmButton
-                          action={deleteProduct.bind(null, p.id)}
-                          confirm={`Delete "${p.name}"? This cannot be undone.`}
-                        >
-                          Delete
-                        </ConfirmButton>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                      <td>{p.durations.length}</td>
+                      <td>
+                        {p.durations[0] ? bdt(p.durations[0].price) : "—"}
+                      </td>
+                      <td>
+                        <form action={toggleProduct.bind(null, p.id)}>
+                          <button
+                            className={`chip ${p.isActive ? "on" : "off"}`}
+                            style={{ border: 0, cursor: "pointer" }}
+                          >
+                            {p.isActive ? "Live" : "Hidden"}
+                          </button>
+                        </form>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <div className="actions" style={{ justifyContent: "flex-end" }}>
+                          <a className="iconlink" href={`/admin/products/${p.id}`}>
+                            Edit
+                          </a>
+                          <ConfirmButton
+                            action={deleteProduct.bind(null, p.id)}
+                            confirm={`Delete "${p.name}"? This cannot be undone.`}
+                          >
+                            Delete
+                          </ConfirmButton>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       ))}

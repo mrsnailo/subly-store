@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useCart } from "@/components/cart/CartProvider";
-import { bdt } from "@/lib/format";
+import { Star, MessageCircle } from "lucide-react";
+import { bdt, getWhatsAppLink } from "@/lib/format";
 import type { StoreCategory, StoreProduct } from "@/lib/queries";
 import { getCategoryCover } from "@/lib/category-covers";
 
-function ProductCard({ product, isOpen = true }: { product: StoreProduct; isOpen?: boolean }) {
-  const { addItem } = useCart();
+function ProductCard({
+  product,
+  isOpen = true,
+  whatsApp = "+880",
+}: {
+  product: StoreProduct;
+  isOpen?: boolean;
+  whatsApp?: string;
+}) {
   const [sel, setSel] = useState(0);
   const d = product.durations[sel] ?? product.durations[0];
 
@@ -26,8 +33,23 @@ function ProductCard({ product, isOpen = true }: { product: StoreProduct; isOpen
       <h3>{product.name}</h3>
       <div className="ptag">{product.tagline}</div>
       <div className="stars">
-        <span className="st">★★★★★</span>
-        {product.rating.toFixed(1)}
+        <span className="st" style={{ display: "inline-flex", gap: "2px", alignItems: "center" }}>
+          {[...Array(5)].map((_, i) => {
+            const starValue = i + 1;
+            const isFilled = starValue <= Math.round(product.rating);
+            return (
+              <Star
+                key={i}
+                size={13}
+                fill={isFilled ? "currentColor" : "none"}
+                stroke="currentColor"
+              />
+            );
+          })}
+        </span>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink-soft)" }}>
+          {product.rating.toFixed(1)}
+        </span>
       </div>
       <div className="durs">
         {product.durations.map((dur, i) => (
@@ -45,22 +67,41 @@ function ProductCard({ product, isOpen = true }: { product: StoreProduct; isOpen
         {d.wasPrice != null && <span className="was">{bdt(d.wasPrice)}</span>}
         <span className="per">/ {d.label}</span>
       </div>
-      <button
-        className="btn btn-ink add"
-        disabled={!isOpen}
-        style={!isOpen ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
-        onClick={() =>
-          isOpen && addItem({
-            key: `${product.id}-${d.label}`,
-            name: product.name,
-            duration: d.label,
-            price: d.price,
-            color: product.brandColor,
-          })
-        }
-      >
-        {isOpen ? "＋ Add to cart" : "Store Closed"}
-      </button>
+      {isOpen ? (
+        <a
+          href={getWhatsAppLink(
+            whatsApp,
+            `Hi! I'd like to order "${product.name}" (${d.label}) for ${bdt(d.price)}.`
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-ink add"
+          style={{
+            textDecoration: "none",
+            textAlign: "center",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <MessageCircle size={16} /> Order on WhatsApp
+        </a>
+      ) : (
+        <button
+          className="btn btn-ink add"
+          disabled
+          style={{
+            opacity: 0.5,
+            cursor: "not-allowed",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Store Closed
+        </button>
+      )}
     </div>
   );
 }
@@ -69,10 +110,12 @@ export function Shop({
   categories,
   products,
   isOpen = true,
+  whatsApp = "+880",
 }: {
   categories: StoreCategory[];
   products: StoreProduct[];
   isOpen?: boolean;
+  whatsApp?: string;
 }) {
   const [active, setActive] = useState("all");
   const list =
@@ -88,8 +131,8 @@ export function Shop({
             <div className="kicker">Marketplace</div>
             <h2>Pick your subscription</h2>
             <p>
-              Genuine accounts &amp; upgrades. Choose a duration, add to cart,
-              pay locally.
+              Genuine accounts &amp; upgrades. Choose a duration, order directly
+              on WhatsApp, pay locally.
             </p>
           </div>
           <a href="#shop" className="btn btn-ghost">
@@ -125,7 +168,14 @@ export function Shop({
           {list.length === 0 ? (
             <div className="empty-grid">No subscriptions in this category yet.</div>
           ) : (
-            list.map((p) => <ProductCard key={p.id} product={p} isOpen={isOpen} />)
+            list.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                isOpen={isOpen}
+                whatsApp={whatsApp}
+              />
+            ))
           )}
         </div>
       </div>
