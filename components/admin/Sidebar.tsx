@@ -72,7 +72,6 @@ export function Sidebar({ ownerName, storeName = "Subly", logoUrl }: SidebarProp
             );
           })}
         </nav>
-        <div className="spacer" />
         <div className="admin-side-user">
           <div
             style={{
