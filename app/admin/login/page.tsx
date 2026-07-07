@@ -1,23 +1,33 @@
 import { LoginForm } from "./LoginForm";
+import { getStoreSettings } from "@/lib/queries";
+import { Logo } from "@/components/Logo";
+import { ArrowLeft } from "lucide-react";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Admin · Subly" };
+export const dynamic = "force-dynamic";
 
-export default function LoginPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getStoreSettings();
+  return {
+    title: `Admin · ${settings.storeName}`,
+  };
+}
+
+export default async function LoginPage() {
+  const settings = await getStoreSettings();
+
   return (
     <div className="auth-wrap">
       <div className="auth-card">
         <a className="logo" href="/">
-          <span className="mark">
-            <span />
-          </span>
-          Subly
+          <Logo storeName={settings.storeName} logoUrl={settings.logoUrl} />
         </a>
         <h1>Owner sign in</h1>
-        <p className="sub">Manage your subscription store.</p>
+        <p className="sub">Manage your {settings.storeName}.</p>
         <LoginForm />
         <p style={{ marginTop: 18 }}>
-          <a className="muted-link" href="/">
-            ← Back to store
+          <a className="muted-link" href="/" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            <ArrowLeft size={14} /> Back to store
           </a>
         </p>
       </div>

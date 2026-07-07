@@ -34,50 +34,54 @@ export async function getStorefront(): Promise<{
   categories: StoreCategory[];
   products: StoreProduct[];
 }> {
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    include: {
-      products: {
-        where: { isActive: true },
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-        include: { durations: { orderBy: { sortOrder: "asc" } } },
+  try {
+    const categories = await prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        products: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+          include: { durations: { orderBy: { sortOrder: "asc" } } },
+        },
       },
-    },
-  });
+    });
 
-  const cats: StoreCategory[] = categories.map((c) => ({
-    id: c.id,
-    name: c.name,
-    slug: c.slug,
-    emoji: c.emoji,
-    coverKey: c.coverKey,
-  }));
+    const cats: StoreCategory[] = categories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      emoji: c.emoji,
+      coverKey: c.coverKey,
+    }));
 
-  const products: StoreProduct[] = categories.flatMap((c) =>
-    c.products
-      .filter((p) => p.durations.length > 0)
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        tagline: p.tagline,
-        wordmark: p.wordmark,
-        brandColor: p.brandColor,
-        brandBg: p.brandBg,
-        rating: p.rating,
-        badgeText: p.badgeText,
-        badgeKind: p.badgeKind,
-        categorySlug: c.slug,
-        durations: p.durations.map((d) => ({
-          id: d.id,
-          label: d.label,
-          price: d.price,
-          wasPrice: d.wasPrice,
+    const products: StoreProduct[] = categories.flatMap((c) =>
+      c.products
+        .filter((p) => p.durations.length > 0)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          tagline: p.tagline,
+          wordmark: p.wordmark,
+          brandColor: p.brandColor,
+          brandBg: p.brandBg,
+          rating: p.rating,
+          badgeText: p.badgeText,
+          badgeKind: p.badgeKind,
+          categorySlug: c.slug,
+          durations: p.durations.map((d) => ({
+            id: d.id,
+            label: d.label,
+            price: d.price,
+            wasPrice: d.wasPrice,
+          })),
         })),
-      })),
-  );
+    );
 
-  return { categories: cats, products };
+    return { categories: cats, products };
+  } catch (e) {
+    return { categories: [], products: [] };
+  }
 }
 
 export type StoreSettings = {
@@ -88,14 +92,26 @@ export type StoreSettings = {
   currency: string;
   logoUrl: string | null;
   isOpen: boolean;
+  updatedAt: Date;
 };
 
 export async function getStoreSettings(): Promise<StoreSettings> {
-  const settings = await prisma.storeSettings.findFirst({
-    orderBy: { createdAt: "asc" },
-  });
-  if (settings) {
-    return settings;
+  try {
+    const settings = await prisma.storeSettings.findFirst({
+      orderBy: { createdAt: "asc" },
+    });
+    if (settings) {
+      let logoUrl = settings.logoUrl;
+      if (logoUrl && logoUrl.startsWith("/logo.png")) {
+        logoUrl = `${logoUrl}?v=${settings.updatedAt.getTime()}`;
+      }
+      return {
+        ...settings,
+        logoUrl,
+      };
+    }
+  } catch (e) {
+    // Gracefully handle db errors during build
   }
   return {
     id: "default-settings",
@@ -105,5 +121,6 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     currency: "BDT",
     logoUrl: "/logo.svg",
     isOpen: true,
+    updatedAt: new Date(),
   };
 }

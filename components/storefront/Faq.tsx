@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, Minus } from "lucide-react";
 
 const QA = [
   {
@@ -28,7 +29,10 @@ export function Faq() {
       {QA.map((item, i) => (
         <div key={i} className={`qa ${open === i ? "open" : ""}`}>
           <button onClick={() => setOpen(open === i ? null : i)}>
-            {item.q} <span className="chev">+</span>
+            {item.q}{" "}
+            <span className="chev">
+              {open === i ? <Minus size={16} /> : <Plus size={16} />}
+            </span>
           </button>
           <div className="ans">
             <p>{item.a}</p>
@@ -38,3 +42,4 @@ export function Faq() {
     </div>
   );
 }
+

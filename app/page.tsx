@@ -5,6 +5,8 @@ import { Toast } from "@/components/storefront/Toast";
 import { Faq } from "@/components/storefront/Faq";
 import { getStorefront, getStoreSettings } from "@/lib/queries";
 import { getWhatsAppLink } from "@/lib/format";
+import { Logo } from "@/components/Logo";
+import { Star, Zap, ShieldCheck, CreditCard, MessageCircle, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -35,12 +37,12 @@ export default async function Home() {
       {!settings.isOpen && (
         <div style={{ background: "rgba(239, 68, 68, 0.15)", borderBottom: "1px solid rgba(239, 68, 68, 0.25)", padding: "10px 0", color: "#f87171", fontSize: "14px", fontWeight: 500, textAlign: "center" }}>
           <div className="wrap">
-            🛑 <b>Store Temporarily Closed</b> — We are currently not accepting new orders. Cart checkout and WhatsApp ordering are disabled.
+            🛑 <b>Store Temporarily Closed</b> — We are currently not accepting new orders. WhatsApp ordering is disabled.
           </div>
         </div>
       )}
 
-      <SiteNav storeName={settings.storeName} />
+      <SiteNav storeName={settings.storeName} logoUrl={settings.logoUrl} />
 
       {/* Hero */}
       <section className="hero">
@@ -55,12 +57,12 @@ export default async function Home() {
             </h1>
             <p className="sub">
               Netflix, ChatGPT Plus, Spotify, Canva &amp; {serviceCount}+ more —
-              delivered to your inbox in minutes. Genuine plans, local payment,
+              ordered via WhatsApp in minutes. Genuine plans, local payment,
               real support.
             </p>
             <div className="hero-cta">
-              <a href="#shop" className="btn btn-lime">
-                Browse subscriptions →
+              <a href="#shop" className="btn btn-lime" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                Browse subscriptions <ArrowRight size={16} />
               </a>
               <a
                 href="#how"
@@ -82,7 +84,9 @@ export default async function Home() {
                 <span>Avg. delivery</span>
               </div>
               <div className="s">
-                <b>4.9★</b>
+                <b style={{ display: "inline-flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+                  4.9 <Star size={16} fill="currentColor" stroke="none" style={{ color: "#fbbf24" }} />
+                </b>
                 <span>2,300 reviews</span>
               </div>
             </div>
@@ -144,28 +148,36 @@ export default async function Home() {
       <div className="trust">
         <div className="wrap">
           <div className="item">
-            <div className="ic">⚡</div>
+            <div className="ic" style={{ color: "var(--lime-deep)" }}>
+              <Zap size={20} fill="currentColor" />
+            </div>
             <div>
               <b>Instant delivery</b>
               <span>Auto-sent in minutes</span>
             </div>
           </div>
           <div className="item">
-            <div className="ic">🛡️</div>
+            <div className="ic" style={{ color: "var(--lime-deep)" }}>
+              <ShieldCheck size={20} />
+            </div>
             <div>
               <b>Warranty included</b>
               <span>Free replacement</span>
             </div>
           </div>
           <div className="item">
-            <div className="ic">💳</div>
+            <div className="ic" style={{ color: "var(--lime-deep)" }}>
+              <CreditCard size={20} />
+            </div>
             <div>
               <b>Local payment</b>
               <span>bKash · Nagad · Rocket</span>
             </div>
           </div>
           <div className="item">
-            <div className="ic">💬</div>
+            <div className="ic" style={{ color: "var(--lime-deep)" }}>
+              <MessageCircle size={20} />
+            </div>
             <div>
               <b>24/7 support</b>
               <span>WhatsApp &amp; live chat</span>
@@ -175,7 +187,7 @@ export default async function Home() {
       </div>
 
       {/* Shop — dynamic from DB */}
-      <Shop categories={categories} products={products} isOpen={settings.isOpen} />
+      <Shop categories={categories} products={products} isOpen={settings.isOpen} whatsApp={settings.whatsApp} />
 
       {/* How it works */}
       <div id="how" className="how">
@@ -189,26 +201,23 @@ export default async function Home() {
           <div className="steps">
             <div className="step">
               <div className="num">1</div>
-              <h4>Choose &amp; add to cart</h4>
+              <h4>Choose subscription</h4>
               <p>
-                Browse all services, pick the duration that fits, and drop it in
-                your cart.
+                Browse all services, pick the duration that fits.
               </p>
             </div>
             <div className="step">
               <div className="num">2</div>
-              <h4>Pay locally</h4>
+              <h4>Order on WhatsApp</h4>
               <p>
-                Checkout with bKash, Nagad, Rocket or card. Your order is
-                confirmed instantly.
+                Click &quot;Order on WhatsApp&quot; to connect with us instantly.
               </p>
             </div>
             <div className="step">
               <div className="num">3</div>
-              <h4>Get instant access</h4>
+              <h4>Pay &amp; get access</h4>
               <p>
-                Credentials or activation arrive on WhatsApp &amp; email within
-                minutes — backed by warranty.
+                Pay via bKash, Nagad, or Rocket. Credentials or activation arrive on WhatsApp within minutes.
               </p>
             </div>
           </div>
@@ -259,7 +268,7 @@ export default async function Home() {
       </section>
 
       {/* Reviews */}
-      <section className="block" style={{ paddingTop: 0 }}>
+      <section id="reviews" className="block" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <div className="sec-head">
             <div>
@@ -269,7 +278,11 @@ export default async function Home() {
           </div>
           <div className="reviews">
             <div className="review">
-              <div className="st">★★★★★</div>
+              <div className="st" style={{ display: "flex", gap: "2px", marginBottom: "8px", color: "#fbbf24" }}>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} fill="currentColor" stroke="none" />
+                ))}
+              </div>
               <p>
                 &quot;Ordered ChatGPT Plus at 11pm, got the login in 4 minutes
                 over WhatsApp. Cheaper than paying in dollars and it just
@@ -284,7 +297,11 @@ export default async function Home() {
               </div>
             </div>
             <div className="review">
-              <div className="st">★★★★★</div>
+              <div className="st" style={{ display: "flex", gap: "2px", marginBottom: "8px", color: "#fbbf24" }}>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} fill="currentColor" stroke="none" />
+                ))}
+              </div>
               <p>
                 &quot;Netflix 4K for the whole family at a fraction of the price.
                 Had one issue and they replaced it same day. Proper
@@ -299,7 +316,11 @@ export default async function Home() {
               </div>
             </div>
             <div className="review">
-              <div className="st">★★★★★</div>
+              <div className="st" style={{ display: "flex", gap: "2px", marginBottom: "8px", color: "#fbbf24" }}>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} fill="currentColor" stroke="none" />
+                ))}
+              </div>
               <p>
                 &quot;bKash payment, instant delivery, no drama. I&apos;ve bought
                 Spotify and Canva from here — my go-to now.&quot;
@@ -343,10 +364,7 @@ export default async function Home() {
           <div className="fcols">
             <div>
               <a className="logo" href="#">
-                <span className="mark">
-                  <span />
-                </span>
-                {settings.storeName}
+                <Logo storeName={settings.storeName} logoUrl={settings.logoUrl} />
               </a>
               <p className="blurb">
                 Bangladesh&apos;s trusted store for premium digital
@@ -370,16 +388,14 @@ export default async function Home() {
             </div>
             <div>
               <h5>Company</h5>
-              <a href="#">About us</a>
               <a href="#how">How it works</a>
-              <a href="#">Reviews</a>
+              <a href="#reviews">Reviews</a>
               <a href={`mailto:${settings.contactEmail}`}>Contact Us</a>
             </div>
             <div>
               <h5>Support</h5>
               <a href="#faq">FAQ</a>
               <a href={getWhatsAppLink(settings.whatsApp, "Hi, I need support with my subscription.")} target="_blank" rel="noopener noreferrer">WhatsApp Support</a>
-              <a href="#">Warranty policy</a>
               <a href="/admin">Admin</a>
             </div>
           </div>
@@ -392,12 +408,23 @@ export default async function Home() {
 
       {/* Floating WhatsApp */}
       {settings.isOpen ? (
-        <a className="wa" href={getWhatsAppLink(settings.whatsApp, "Hi! I'd like to order a subscription.")} target="_blank" rel="noopener noreferrer">
-          💬 Order on WhatsApp
+        <a
+          className="wa"
+          href={getWhatsAppLink(settings.whatsApp, "Hi! I'd like to order a subscription.")}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+        >
+          <MessageCircle size={18} /> Order on WhatsApp
         </a>
       ) : (
-        <a className="wa" href="#" onClick={(e) => e.preventDefault()} style={{ opacity: 0.6, cursor: "not-allowed", background: "#4b5563" }}>
-          💬 Store Closed
+        <a
+          className="wa"
+          href="#"
+          onClick={(e) => e.preventDefault()}
+          style={{ opacity: 0.6, cursor: "not-allowed", background: "#4b5563", display: "inline-flex", alignItems: "center", gap: "8px" }}
+        >
+          <MessageCircle size={18} /> Store Closed
         </a>
       )}
 

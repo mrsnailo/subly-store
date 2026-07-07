@@ -1,18 +1,15 @@
 "use client";
 
-import { useCart } from "@/components/cart/CartProvider";
+import { Search, User } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
-export function SiteNav({ storeName = "Subly" }: { storeName?: string }) {
-  const { count, openCart } = useCart();
+export function SiteNav({ storeName = "Subly", logoUrl }: { storeName?: string; logoUrl?: string | null }) {
   return (
     <header className="site">
       <div className="wrap">
         <nav>
           <a className="logo" href="#">
-            <span className="mark">
-              <span />
-            </span>
-            {storeName}
+            <Logo storeName={storeName} logoUrl={logoUrl} />
           </a>
           <div className="navlinks">
             <a href="#shop">All Subscriptions</a>
@@ -23,19 +20,16 @@ export function SiteNav({ storeName = "Subly" }: { storeName?: string }) {
           </div>
           <div className="nav-right">
             <div className="search">
-              <span>🔍</span>
+              <Search size={16} style={{ flexShrink: 0 }} />
               <input placeholder="Search Netflix, ChatGPT…" />
             </div>
             <a className="iconbtn" aria-label="Account" href="/admin">
-              👤
+              <User size={18} />
             </a>
-            <button className="iconbtn" aria-label="Cart" onClick={openCart}>
-              🛒
-              {count > 0 && <span className="cart-count">{count}</span>}
-            </button>
           </div>
         </nav>
       </div>
     </header>
   );
 }
+

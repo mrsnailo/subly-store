@@ -14,6 +14,7 @@ export default async function AdminSettingsPage() {
     whatsApp: settings?.whatsApp ?? "+880",
     currency: settings?.currency ?? "BDT",
     isOpen: settings?.isOpen ?? true,
+    logoUrl: settings?.logoUrl ?? "/logo.svg",
   };
 
   return (
@@ -21,7 +22,7 @@ export default async function AdminSettingsPage() {
       <div className="admin-head">
         <div>
           <h1>Settings</h1>
-          <p>Store identity, contact channels, currency &amp; open/closed status.</p>
+          <p>Store identity, logo, favicon, contact channels &amp; open/closed status.</p>
         </div>
       </div>
 

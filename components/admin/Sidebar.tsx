@@ -3,15 +3,23 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { logout } from "@/lib/auth-actions";
+import { LayoutDashboard, Layers, Package, Settings, LogOut } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 const LINKS = [
-  { href: "/admin", label: "Dashboard", icon: "▣" },
-  { href: "/admin/categories", label: "Categories", icon: "🗂️" },
-  { href: "/admin/products", label: "Products", icon: "📦" },
-  { href: "/admin/settings", label: "Settings", icon: "⚙️" },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/categories", label: "Categories", icon: Layers },
+  { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar({ ownerName }: { ownerName: string }) {
+interface SidebarProps {
+  ownerName: string;
+  storeName?: string;
+  logoUrl?: string | null;
+}
+
+export function Sidebar({ ownerName, storeName = "Subly", logoUrl }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
@@ -20,21 +28,21 @@ export function Sidebar({ ownerName }: { ownerName: string }) {
   return (
     <aside className="admin-side">
       <a className="logo" href="/">
-        <span className="mark">
-          <span />
-        </span>
-        Subly
+        <Logo storeName={storeName} logoUrl={logoUrl} />
       </a>
-      {LINKS.map((l) => (
-        <Link
-          key={l.href}
-          href={l.href}
-          className={`navi ${isActive(l.href) ? "active" : ""}`}
-        >
-          <span>{l.icon}</span>
-          {l.label}
-        </Link>
-      ))}
+      {LINKS.map((l) => {
+        const Icon = l.icon;
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`navi ${isActive(l.href) ? "active" : ""}`}
+          >
+            <Icon size={16} />
+            {l.label}
+          </Link>
+        );
+      })}
       <div className="spacer" />
       <div
         style={{
@@ -56,9 +64,12 @@ export function Sidebar({ ownerName }: { ownerName: string }) {
             border: 0,
             cursor: "pointer",
             textAlign: "left",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
           }}
         >
-          <span>⎋</span> Sign out
+          <LogOut size={16} /> Sign out
         </button>
       </form>
     </aside>
