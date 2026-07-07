@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* Clash Display */
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/clash-display-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: optional;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/clash-display-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: optional;
+  font-style: normal;
+}
+
+/* General Sans */
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: optional;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: optional;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: optional;
+  font-style: normal;
+}
+
 /* ──────────────────────────────────────────────────────────────
    Subly design system — ported from the hi-fi prototype.
    Ink #14151A + Cream #F5F3EE + electric-lime accent #C6FF3D.
