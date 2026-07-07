@@ -57,47 +57,49 @@ export default async function Dashboard() {
 
       <div className="panel">
         <div className="panel-h">Recently updated</div>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Category</th>
-              <th>From</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recent.map((p) => {
-              const from = p.durations[0]?.price;
-              return (
-                <tr key={p.id}>
-                  <td>
-                    <span className="brand-mini">
-                      <span className="wm" style={{ color: p.brandColor }}>
-                        {p.wordmark}
+        <div className="table-responsive">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>From</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((p) => {
+                const from = p.durations[0]?.price;
+                return (
+                  <tr key={p.id}>
+                    <td>
+                      <span className="brand-mini">
+                        <span className="wm" style={{ color: p.brandColor }}>
+                          {p.wordmark}
+                        </span>
+                        {p.name}
                       </span>
-                      {p.name}
-                    </span>
-                  </td>
-                  <td>{p.category.name}</td>
-                  <td>{from != null ? bdt(from) : "—"}</td>
-                  <td>
-                    <span className={`chip ${p.isActive ? "on" : "off"}`}>
-                      {p.isActive ? "Live" : "Hidden"}
-                    </span>
+                    </td>
+                    <td>{p.category.name}</td>
+                    <td>{from != null ? bdt(from) : "—"}</td>
+                    <td>
+                      <span className={`chip ${p.isActive ? "on" : "off"}`}>
+                        {p.isActive ? "Live" : "Hidden"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {recent.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ color: "var(--muted)" }}>
+                    No products yet. Create your first one.
                   </td>
                 </tr>
-              );
-            })}
-            {recent.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ color: "var(--muted)" }}>
-                  No products yet. Create your first one.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
