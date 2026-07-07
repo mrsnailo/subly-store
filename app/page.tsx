@@ -8,8 +8,6 @@ import { getWhatsAppLink } from "@/lib/format";
 import { Logo } from "@/components/Logo";
 import { Star, Zap, ShieldCheck, CreditCard, MessageCircle, ArrowRight } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const { categories, products } = await getStorefront();
   const settings = await getStoreSettings();

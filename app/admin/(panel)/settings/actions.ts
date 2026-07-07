@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import fs from "fs/promises";
@@ -103,6 +103,8 @@ export async function updateStoreSettings(formData: FormData) {
     });
   }
 
+  revalidateTag("store-settings", { expire: 0 });
+  revalidateTag("storefront", { expire: 0 });
   revalidatePath("/");
   revalidatePath("/admin/settings");
 

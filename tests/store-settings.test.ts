@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { describe, it, expect, beforeAll } from "vitest";
 import { prisma } from "../lib/prisma";
-import { getStoreSettings } from "../lib/queries";
+import { getStoreSettings, getStorefront } from "../lib/queries";
 import { sanitizeWhatsAppNumber, getWhatsAppLink } from "../lib/format";
 
 describe("StoreSettings Model", () => {
@@ -93,6 +93,22 @@ describe("StoreSettings Model", () => {
         },
       });
     }
+  });
+
+  describe("Caching and Storefront Queries", () => {
+    it("should retrieve storefront catalog successfully", async () => {
+      const sf = await getStorefront();
+      expect(sf).toBeDefined();
+      expect(sf.categories).toBeInstanceOf(Array);
+      expect(sf.products).toBeInstanceOf(Array);
+    });
+
+    it("should retrieve settings successfully with Date objects", async () => {
+      const settings = await getStoreSettings();
+      expect(settings).toBeDefined();
+      expect(settings.storeName).toBeDefined();
+      expect(settings.updatedAt).toBeInstanceOf(Date);
+    });
   });
 
   describe("WhatsApp Sanitizer Helpers", () => {
