@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 export type StoreDuration = {
   id: string;
@@ -29,11 +31,8 @@ export type StoreCategory = {
   coverKey: string | null;
 };
 
-/** Active categories (ordered) + active products with their price tiers, for the storefront. */
-export async function getStorefront(): Promise<{
-  categories: StoreCategory[];
-  products: StoreProduct[];
-}> {
+/** Raw database query for storefront. */
+const fetchStorefront = async () => {
   try {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
@@ -82,7 +81,25 @@ export async function getStorefront(): Promise<{
   } catch (e) {
     return { categories: [], products: [] };
   }
-}
+};
+
+/** Cache storefront data across requests using Next.js unstable_cache. */
+const getCachedStorefront = unstable_cache(
+  async () => fetchStorefront(),
+  ["storefront-data"],
+  { tags: ["storefront"] }
+);
+
+/** Active categories (ordered) + active products with their price tiers, for the storefront.
+ * Bypasses both React cache and Next.js unstable_cache in Vitest environment.
+ */
+export const getStorefront = (process.env.VITEST === "true" || process.env.NODE_ENV === "test")
+  ? async () => {
+      return fetchStorefront();
+    }
+  : cache(async () => {
+      return getCachedStorefront();
+    });
 
 export type StoreSettings = {
   id: string;
@@ -95,7 +112,12 @@ export type StoreSettings = {
   updatedAt: Date;
 };
 
-export async function getStoreSettings(): Promise<StoreSettings> {
+type SerializedStoreSettings = Omit<StoreSettings, "updatedAt"> & {
+  updatedAt: string;
+};
+
+/** Raw database query for store settings. */
+const fetchStoreSettings = async (): Promise<SerializedStoreSettings> => {
   try {
     const settings = await prisma.storeSettings.findFirst({
       orderBy: { createdAt: "asc" },
@@ -106,8 +128,14 @@ export async function getStoreSettings(): Promise<StoreSettings> {
         logoUrl = `${logoUrl}?v=${settings.updatedAt.getTime()}`;
       }
       return {
-        ...settings,
+        id: settings.id,
+        storeName: settings.storeName,
+        contactEmail: settings.contactEmail,
+        whatsApp: settings.whatsApp,
+        currency: settings.currency,
         logoUrl,
+        isOpen: settings.isOpen,
+        updatedAt: settings.updatedAt.toISOString(),
       };
     }
   } catch (e) {
@@ -121,6 +149,33 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     currency: "BDT",
     logoUrl: "/logo.svg",
     isOpen: true,
-    updatedAt: new Date(),
+    updatedAt: new Date().toISOString(),
   };
-}
+};
+
+/** Cache settings data across requests using Next.js unstable_cache. */
+const getCachedStoreSettings = unstable_cache(
+  async () => fetchStoreSettings(),
+  ["store-settings-data"],
+  { tags: ["store-settings"] }
+);
+
+/** Get global store settings.
+ * Deserializes updatedAt string back into a Date object.
+ * Bypasses both React cache and Next.js unstable_cache in Vitest environment.
+ */
+export const getStoreSettings = (process.env.VITEST === "true" || process.env.NODE_ENV === "test")
+  ? async (): Promise<StoreSettings> => {
+      const settings = await fetchStoreSettings();
+      return {
+        ...settings,
+        updatedAt: new Date(settings.updatedAt),
+      };
+    }
+  : cache(async (): Promise<StoreSettings> => {
+      const settings = await getCachedStoreSettings();
+      return {
+        ...settings,
+        updatedAt: new Date(settings.updatedAt),
+      };
+    });

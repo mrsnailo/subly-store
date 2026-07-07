@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -13,6 +13,8 @@ async function requireAdmin() {
 }
 
 function revalidateAll() {
+  revalidateTag("storefront", { expire: 0 });
+  revalidateTag("store-settings", { expire: 0 });
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/categories");
