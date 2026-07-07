@@ -1304,6 +1304,13 @@ footer.site {
   margin-bottom: 22px;
   padding: 0 8px;
 }
+/* Pin the nav to its natural height. Its flex base size can otherwise resolve
+   short (icons measure small during basis calc), letting the links overflow
+   the nav box and fall under a sibling that then swallows their clicks. */
+.admin-nav-list {
+  flex: 0 0 auto;
+  height: auto;
+}
 .admin-side a.navi {
   display: flex;
   align-items: center;
@@ -1323,12 +1330,16 @@ footer.site {
   background: var(--lime);
   color: var(--ink);
 }
-.admin-side .spacer {
-  flex: 1;
+.admin-side-user {
+  margin-top: auto;
 }
 .admin-main {
   padding: 34px 40px 80px;
   background: var(--cream);
+  /* Allow this grid column to shrink below its content's intrinsic width so
+     wide tables scroll inside .table-responsive instead of pushing the whole
+     page past the viewport (mobile horizontal overflow). */
+  min-width: 0;
 }
 .admin-head {
   display: flex;
@@ -1683,9 +1694,6 @@ footer.site {
   }
   .admin-side .logo.logo-desktop {
     display: none;
-  }
-  .admin-side .spacer {
-    display: block;
   }
   .admin-main {
     padding: 24px 18px 60px;
