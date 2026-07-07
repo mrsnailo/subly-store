@@ -1230,7 +1230,10 @@ footer.site {
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
+
 .admin-side .logo {
   color: #fff;
   margin-bottom: 22px;
