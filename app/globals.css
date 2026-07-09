@@ -1311,7 +1311,7 @@ footer.site {
   flex: 0 0 auto;
   height: auto;
 }
-.admin-side a.navi {
+.admin-side .navi {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1322,11 +1322,11 @@ footer.site {
   color: #b6b7bf;
   transition: 0.14s;
 }
-.admin-side a.navi:hover {
+.admin-side .navi:hover {
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
 }
-.admin-side a.navi.active {
+.admin-side .navi.active {
   background: var(--lime);
   color: var(--ink);
 }

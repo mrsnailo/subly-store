@@ -40,9 +40,9 @@ export async function updateStoreSettings(formData: FormData) {
   // Handle Logo Upload
   const logoFile = formData.get("logo") as File | null;
   if (logoFile && logoFile.size > 0) {
-    const ext = logoFile.name.substring(logoFile.name.lastIndexOf(".")).toLowerCase() || ".png";
-    const blob = await put(`store/logo${ext}`, logoFile, {
+    const blob = await put("settings/logo.png", logoFile, {
       access: "public",
+      allowOverwrite: true,
       addRandomSuffix: false,
     });
     logoUrl = blob.url;
@@ -56,9 +56,9 @@ export async function updateStoreSettings(formData: FormData) {
   // Handle Favicon Upload
   const faviconFile = formData.get("favicon") as File | null;
   if (faviconFile && faviconFile.size > 0) {
-    const ext = faviconFile.name.substring(faviconFile.name.lastIndexOf(".")).toLowerCase() || ".png";
-    const blob = await put(`store/favicon${ext}`, faviconFile, {
+    const blob = await put("settings/favicon.png", faviconFile, {
       access: "public",
+      allowOverwrite: true,
       addRandomSuffix: false,
     });
     faviconUrl = blob.url;
@@ -93,4 +93,90 @@ export async function updateStoreSettings(formData: FormData) {
   revalidatePath("/admin/settings");
 
   return { ok: true } as const;
+}
+
+export async function uploadLogoAction(formData: FormData) {
+  await requireAdmin();
+  const file = formData.get("logo") as File | null;
+  if (!file || file.size === 0) {
+    throw new Error("No file uploaded");
+  }
+
+  const blob = await put("settings/logo.png", file, {
+    access: "public",
+    allowOverwrite: true,
+    addRandomSuffix: false,
+  });
+
+  const existing = await prisma.storeSettings.findFirst({
+    orderBy: { createdAt: "asc" },
+  });
+
+  if (existing) {
+    await prisma.storeSettings.update({
+      where: { id: existing.id },
+      data: { logoUrl: blob.url },
+    });
+  } else {
+    await prisma.storeSettings.create({
+      data: {
+        storeName: "Subly Store",
+        contactEmail: "owner@subly.shop",
+        whatsApp: "+880",
+        currency: "BDT",
+        isOpen: true,
+        logoUrl: blob.url,
+      },
+    });
+  }
+
+  revalidateTag("store-settings", { expire: 0 });
+  revalidateTag("storefront", { expire: 0 });
+  revalidatePath("/");
+  revalidatePath("/admin/settings");
+
+  return { ok: true, url: blob.url };
+}
+
+export async function uploadFaviconAction(formData: FormData) {
+  await requireAdmin();
+  const file = formData.get("favicon") as File | null;
+  if (!file || file.size === 0) {
+    throw new Error("No file uploaded");
+  }
+
+  const blob = await put("settings/favicon.png", file, {
+    access: "public",
+    allowOverwrite: true,
+    addRandomSuffix: false,
+  });
+
+  const existing = await prisma.storeSettings.findFirst({
+    orderBy: { createdAt: "asc" },
+  });
+
+  if (existing) {
+    await prisma.storeSettings.update({
+      where: { id: existing.id },
+      data: { faviconUrl: blob.url },
+    });
+  } else {
+    await prisma.storeSettings.create({
+      data: {
+        storeName: "Subly Store",
+        contactEmail: "owner@subly.shop",
+        whatsApp: "+880",
+        currency: "BDT",
+        isOpen: true,
+        faviconUrl: blob.url,
+      },
+    });
+  }
+
+  revalidateTag("store-settings", { expire: 0 });
+  revalidateTag("storefront", { expire: 0 });
+  revalidatePath("/");
+  revalidatePath("/admin/settings");
+
+  return { ok: true, url: blob.url };
 }
