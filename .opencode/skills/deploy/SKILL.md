@@ -5,10 +5,9 @@ description: Deploy the Subly Store to Vercel production. Use when the user says
 
 # Deploy to Vercel
 
-Run these three commands sequentially:
+Run these commands sequentially:
 
 ```bash
 git pull origin main
-vercel build --prod
-vercel deploy --prebuilt --prod
+vercel deploy --prod
 ```

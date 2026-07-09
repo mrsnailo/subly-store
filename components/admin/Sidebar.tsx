@@ -4,7 +4,15 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { logout } from "@/lib/auth-actions";
-import { LayoutDashboard, Layers, Package, Settings, LogOut, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Layers,
+  Package,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const LINKS = [
@@ -20,7 +28,11 @@ interface SidebarProps {
   logoUrl?: string | null;
 }
 
-export function Sidebar({ ownerName, storeName = "Subly", logoUrl }: SidebarProps) {
+export function Sidebar({
+  ownerName,
+  storeName = "Subly",
+  logoUrl,
+}: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -45,9 +57,9 @@ export function Sidebar({ ownerName, storeName = "Subly", logoUrl }: SidebarProp
 
       {/* Sidebar Overlay */}
       {isOpen && (
-        <div 
-          className="admin-sidebar-overlay" 
-          onClick={() => setIsOpen(false)} 
+        <div
+          className="admin-sidebar-overlay"
+          onClick={() => setIsOpen(false)}
         />
       )}
 
@@ -56,7 +68,16 @@ export function Sidebar({ ownerName, storeName = "Subly", logoUrl }: SidebarProp
         <a className="logo logo-desktop" href="/">
           <Logo storeName={storeName} logoUrl={logoUrl} />
         </a>
-        <nav className="admin-nav-list" style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+        <nav
+          className="admin-nav-list"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            width: "100%",
+            alignItems: "flex-start",
+          }}
+        >
           {LINKS.map((l) => {
             const Icon = l.icon;
             return (

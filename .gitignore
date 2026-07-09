@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Prisma generated client
 /lib/generated
+
+# Local file uploads (dev fallback for Vercel Blob)
+/public/uploads/

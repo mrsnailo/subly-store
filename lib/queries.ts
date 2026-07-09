@@ -79,6 +79,7 @@ const fetchStorefront = async () => {
 
     return { categories: cats, products };
   } catch (e) {
+    console.error("[fetchStorefront ERROR]", e);
     return { categories: [], products: [] };
   }
 };
