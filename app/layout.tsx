@@ -5,12 +5,35 @@ import { getStoreSettings } from "@/lib/queries";
 import fs from "fs";
 import path from "path";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getStoreSettings();
+
+  const base = new URL(SITE_URL);
+  const title = `${settings.storeName} — Premium Digital Subscriptions`;
+  const description =
+    "Bangladesh's trusted store for premium digital subscriptions. Genuine plans, instant delivery, local payment.";
+
   return {
-    title: `${settings.storeName} — Premium Digital Subscriptions`,
-    description:
-      "Bangladesh's trusted store for premium digital subscriptions. Genuine plans, instant delivery, local payment.",
+    metadataBase: base,
+    title,
+    description,
+    alternates: {
+      canonical: "/",
+    },
+    openGraph: {
+      type: "website",
+      url: "/",
+      title,
+      description,
+      siteName: settings.storeName,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

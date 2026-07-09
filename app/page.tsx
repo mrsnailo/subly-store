@@ -8,13 +8,34 @@ import { getWhatsAppLink } from "@/lib/format";
 import { Logo } from "@/components/Logo";
 import { Star, Zap, ShieldCheck, CreditCard, MessageCircle, ArrowRight } from "lucide-react";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export default async function Home() {
   const { categories, products } = await getStorefront();
   const settings = await getStoreSettings();
   const serviceCount = products.length;
 
+  const orgLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: settings.storeName,
+    url: SITE_URL,
+  };
+
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: settings.storeName,
+    url: SITE_URL,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // JSON-LD must be in server HTML for crawlers.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([orgLd, websiteLd]) }}
+      />
       {/* Announcement */}
       <div className="topbar">
         <div className="wrap">
