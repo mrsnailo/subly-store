@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { getStoreSettings } from "@/lib/queries";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -53,6 +54,7 @@ export default async function RootLayout({
       </head>
       <body>
         <CartProvider>{children}</CartProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
