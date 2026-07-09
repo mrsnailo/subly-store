@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Star, MessageCircle } from "lucide-react";
 import { bdt, getWhatsAppLink } from "@/lib/format";
 import type { StoreCategory, StoreProduct } from "@/lib/queries";
 import { getCategoryCover } from "@/lib/category-covers";
+import Fuse from "fuse.js";
 
 function ProductCard({
   product,
@@ -118,14 +119,62 @@ export function Shop({
   whatsApp?: string;
 }) {
   const [active, setActive] = useState("all");
-  const list =
-    active === "all"
-      ? products
-      : products.filter((p) => p.categorySlug === active);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fuse = useMemo(() => {
+    return new Fuse(products, {
+      keys: [
+        { name: "name", weight: 0.5 },
+        { name: "tagline", weight: 0.25 },
+        { name: "wordmark", weight: 0.25 },
+        { name: "categorySlug", weight: 0.15 },
+        { name: "durations.label", weight: 0.1 },
+      ],
+      threshold: 0.35,
+      ignoreLocation: true,
+      minMatchCharLength: 2,
+    });
+  }, [products]);
+
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim();
+    if (!q) return products;
+    return fuse.search(q).map((r) => r.item);
+  }, [fuse, products, searchQuery]);
+
+  const list = useMemo(() => {
+    if (active === "all") return filtered;
+    return filtered.filter((p) => p.categorySlug === active);
+  }, [active, filtered]);
 
   return (
     <section id="shop" className="block">
       <div className="wrap">
+        <div className="search" style={{ marginBottom: 20 }}>
+          <svg
+            aria-hidden="true"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ flex: "0 0 auto" }}
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            id="product-search"
+            type="search"
+            autoComplete="off"
+            placeholder="Search Netflix, ChatGPT, Spotify…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         <div className="sec-head">
           <div>
             <div className="kicker">Marketplace</div>
@@ -166,7 +215,9 @@ export function Shop({
 
         <div className="grid">
           {list.length === 0 ? (
-            <div className="empty-grid">No subscriptions in this category yet.</div>
+            <div className="empty-grid">
+              {searchQuery.trim() ? "No results found." : "No subscriptions in this category yet."}
+            </div>
           ) : (
             list.map((p) => (
               <ProductCard
