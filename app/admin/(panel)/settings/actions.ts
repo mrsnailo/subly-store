@@ -8,8 +8,10 @@ import { put as vercelPut, del as vercelDel } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
+const isDevOrTest = process.env.NODE_ENV !== "production";
+
 async function put(pathname: string, file: File, options?: any) {
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!isDevOrTest || process.env.BLOB_READ_WRITE_TOKEN) {
     return vercelPut(pathname, file, options);
   }
   const arrayBuffer = await file.arrayBuffer();
@@ -33,7 +35,7 @@ async function put(pathname: string, file: File, options?: any) {
 }
 
 async function del(url: string) {
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!isDevOrTest || process.env.BLOB_READ_WRITE_TOKEN) {
     return vercelDel(url);
   }
   const cleanUrl = url.split("?")[0];
