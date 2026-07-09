@@ -150,9 +150,27 @@ export function Shop({
   return (
     <section id="shop" className="block">
       <div className="wrap">
-        <div className="search" style={{ marginBottom: 14, width: "100%" }}>
+        <div className="search" style={{ marginBottom: 20 }}>
+          <svg
+            aria-hidden="true"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ flex: "0 0 auto" }}
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input
-            placeholder="Search Netflix, ChatGPT…"
+            id="product-search"
+            type="search"
+            autoComplete="off"
+            placeholder="Search Netflix, ChatGPT, Spotify…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

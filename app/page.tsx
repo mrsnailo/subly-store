@@ -432,18 +432,20 @@ export default async function Home() {
           href={getWhatsAppLink(settings.whatsApp, "Hi! I'd like to order a subscription.")}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Order on WhatsApp"
           style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
         >
-          <MessageCircle size={18} /> Order on WhatsApp
+          <MessageCircle size={20} /> Order on WhatsApp
         </a>
       ) : (
         <a
           className="wa"
           href="#"
           onClick={(e) => e.preventDefault()}
+          aria-label="Store Closed"
           style={{ opacity: 0.6, cursor: "not-allowed", background: "#4b5563", display: "inline-flex", alignItems: "center", gap: "8px" }}
         >
-          <MessageCircle size={18} /> Store Closed
+          <MessageCircle size={20} /> Store Closed
         </a>
       )}
 
