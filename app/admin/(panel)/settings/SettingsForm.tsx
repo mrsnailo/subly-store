@@ -10,6 +10,7 @@ export type SettingsDefaults = {
   currency: string;
   isOpen: boolean;
   logoUrl?: string | null;
+  faviconUrl?: string | null;
 };
 
 export function SettingsForm({ defaults }: { defaults: SettingsDefaults }) {

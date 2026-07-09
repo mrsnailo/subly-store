@@ -97,7 +97,8 @@ model StoreSettings {
   contactEmail String
   whatsApp     String
   currency     String   @default("BDT")
-  logoUrl      String? // logo reference
+  logoUrl      String? // logo reference — Vercel Blob URL
+  faviconUrl   String? // favicon reference — Vercel Blob URL
   isOpen       Boolean  @default(true) // open/closed flag
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

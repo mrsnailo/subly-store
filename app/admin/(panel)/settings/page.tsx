@@ -15,6 +15,7 @@ export default async function AdminSettingsPage() {
     currency: settings?.currency ?? "BDT",
     isOpen: settings?.isOpen ?? true,
     logoUrl: settings?.logoUrl ?? "/logo.svg",
+    faviconUrl: settings?.faviconUrl ?? null,
   };
 
   return (
