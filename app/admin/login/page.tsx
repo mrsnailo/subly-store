@@ -4,12 +4,16 @@ import { Logo } from "@/components/Logo";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getStoreSettings();
   return {
+    metadataBase: new URL(SITE_URL),
     title: `Admin · ${settings.storeName}`,
+    robots: { index: false, follow: false },
   };
 }
 
