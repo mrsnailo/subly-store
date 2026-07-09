@@ -1,18 +1,14 @@
 "use client";
 
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 export function SiteNav({
   storeName = "Subly",
   logoUrl,
-  searchQuery,
-  onSearchQueryChange,
 }: {
   storeName?: string;
   logoUrl?: string | null;
-  searchQuery?: string;
-  onSearchQueryChange?: (value: string) => void;
 }) {
   return (
     <header className="site">
@@ -29,14 +25,6 @@ export function SiteNav({
             <a href="#faq">Support</a>
           </div>
           <div className="nav-right">
-            <div className="search">
-              <Search size={16} style={{ flexShrink: 0 }} />
-              <input
-                placeholder="Search Netflix, ChatGPT…"
-                value={searchQuery ?? ""}
-                onChange={(e) => onSearchQueryChange?.(e.target.value)}
-              />
-            </div>
             <a className="iconbtn" aria-label="Account" href="/admin">
               <User size={18} />
             </a>

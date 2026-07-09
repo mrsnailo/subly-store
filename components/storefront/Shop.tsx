@@ -6,7 +6,6 @@ import { bdt, getWhatsAppLink } from "@/lib/format";
 import type { StoreCategory, StoreProduct } from "@/lib/queries";
 import { getCategoryCover } from "@/lib/category-covers";
 import Fuse from "fuse.js";
-import { SiteNav } from "@/components/storefront/SiteNav";
 
 function ProductCard({
   product,
@@ -149,10 +148,15 @@ export function Shop({
   }, [active, filtered]);
 
   return (
-    <>
-      <SiteNav searchQuery={searchQuery} onSearchQueryChange={setSearchQuery} />
-      <section id="shop" className="block">
-        <div className="wrap">
+    <section id="shop" className="block">
+      <div className="wrap">
+        <div className="search" style={{ marginBottom: 14, width: "100%" }}>
+          <input
+            placeholder="Search Netflix, ChatGPT…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         <div className="sec-head">
           <div>
             <div className="kicker">Marketplace</div>
@@ -207,8 +211,7 @@ export function Shop({
             ))
           )}
         </div>
-        </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
