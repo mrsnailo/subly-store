@@ -4,8 +4,7 @@ import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import fs from "fs/promises";
-import path from "path";
+import { put, del } from "@vercel/blob";
 
 async function requireAdmin() {
   const session = await auth();
@@ -36,54 +35,37 @@ export async function updateStoreSettings(formData: FormData) {
   });
 
   let logoUrl = existing?.logoUrl ?? "/logo.svg";
+  let faviconUrl = existing?.faviconUrl ?? null;
 
   // Handle Logo Upload
   const logoFile = formData.get("logo") as File | null;
   if (logoFile && logoFile.size > 0) {
-    const ext = path.extname(logoFile.name).toLowerCase() || ".png";
-    const logoFileName = `logo${ext}`;
-    const logoPath = path.join(process.cwd(), "public", logoFileName);
+    const ext = logoFile.name.substring(logoFile.name.lastIndexOf(".")).toLowerCase() || ".png";
+    const blob = await put(`store/logo${ext}`, logoFile, {
+      access: "public",
+      addRandomSuffix: false,
+    });
+    logoUrl = blob.url;
 
-    // Delete old logo files to avoid clash
-    try {
-      const publicDir = path.join(process.cwd(), "public");
-      const files = await fs.readdir(publicDir);
-      for (const file of files) {
-        if (file.startsWith("logo.") && file !== logoFileName) {
-          await fs.unlink(path.join(publicDir, file));
-        }
-      }
-    } catch (e) {
-      // Ignore directory read or delete errors
+    // Delete old logo blob if the extension changed
+    if (existing?.logoUrl && existing.logoUrl !== blob.url) {
+      try { await del(existing.logoUrl); } catch { /* ignore */ }
     }
-
-    const bytes = await logoFile.arrayBuffer();
-    await fs.writeFile(logoPath, Buffer.from(bytes));
-    logoUrl = `/${logoFileName}`;
   }
 
   // Handle Favicon Upload
   const faviconFile = formData.get("favicon") as File | null;
   if (faviconFile && faviconFile.size > 0) {
-    const ext = path.extname(faviconFile.name).toLowerCase() || ".png";
-    const faviconFileName = `favicon${ext}`;
-    const faviconPath = path.join(process.cwd(), "public", faviconFileName);
+    const ext = faviconFile.name.substring(faviconFile.name.lastIndexOf(".")).toLowerCase() || ".png";
+    const blob = await put(`store/favicon${ext}`, faviconFile, {
+      access: "public",
+      addRandomSuffix: false,
+    });
+    faviconUrl = blob.url;
 
-    // Delete old favicon files
-    try {
-      const publicDir = path.join(process.cwd(), "public");
-      const files = await fs.readdir(publicDir);
-      for (const file of files) {
-        if (file.startsWith("favicon.") && file !== faviconFileName) {
-          await fs.unlink(path.join(publicDir, file));
-        }
-      }
-    } catch (e) {
-      // Ignore errors
+    if (existing?.faviconUrl && existing.faviconUrl !== blob.url) {
+      try { await del(existing.faviconUrl); } catch { /* ignore */ }
     }
-
-    const bytes = await faviconFile.arrayBuffer();
-    await fs.writeFile(faviconPath, Buffer.from(bytes));
   }
 
   if (existing) {
@@ -92,6 +74,7 @@ export async function updateStoreSettings(formData: FormData) {
       data: {
         ...data,
         logoUrl,
+        faviconUrl,
       },
     });
   } else {
@@ -99,6 +82,7 @@ export async function updateStoreSettings(formData: FormData) {
       data: {
         ...data,
         logoUrl,
+        faviconUrl,
       },
     });
   }

@@ -108,6 +108,7 @@ export type StoreSettings = {
   whatsApp: string;
   currency: string;
   logoUrl: string | null;
+  faviconUrl: string | null;
   isOpen: boolean;
   updatedAt: Date;
 };
@@ -123,17 +124,15 @@ const fetchStoreSettings = async (): Promise<SerializedStoreSettings> => {
       orderBy: { createdAt: "asc" },
     });
     if (settings) {
-      let logoUrl = settings.logoUrl;
-      if (logoUrl && logoUrl.startsWith("/logo.png")) {
-        logoUrl = `${logoUrl}?v=${settings.updatedAt.getTime()}`;
-      }
+      const ts = settings.updatedAt.getTime();
       return {
         id: settings.id,
         storeName: settings.storeName,
         contactEmail: settings.contactEmail,
         whatsApp: settings.whatsApp,
         currency: settings.currency,
-        logoUrl,
+        logoUrl: settings.logoUrl ? `${settings.logoUrl}?v=${ts}` : null,
+        faviconUrl: settings.faviconUrl ? `${settings.faviconUrl}?v=${ts}` : null,
         isOpen: settings.isOpen,
         updatedAt: settings.updatedAt.toISOString(),
       };
@@ -148,6 +147,7 @@ const fetchStoreSettings = async (): Promise<SerializedStoreSettings> => {
     whatsApp: "+8801700000000",
     currency: "BDT",
     logoUrl: "/logo.svg",
+    faviconUrl: null,
     isOpen: true,
     updatedAt: new Date().toISOString(),
   };
