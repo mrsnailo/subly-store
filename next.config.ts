@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://api.fontshare.com",
-              "img-src 'self' data: blob:",
+              "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
               "font-src 'self' https://api.fontshare.com https://cdn.fontshare.com",
               "object-src 'none'",
               "base-uri 'self'",
