@@ -3,7 +3,17 @@
 import { Search, User } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
-export function SiteNav({ storeName = "Subly", logoUrl }: { storeName?: string; logoUrl?: string | null }) {
+export function SiteNav({
+  storeName = "Subly",
+  logoUrl,
+  searchQuery,
+  onSearchQueryChange,
+}: {
+  storeName?: string;
+  logoUrl?: string | null;
+  searchQuery?: string;
+  onSearchQueryChange?: (value: string) => void;
+}) {
   return (
     <header className="site">
       <div className="wrap">
@@ -21,7 +31,11 @@ export function SiteNav({ storeName = "Subly", logoUrl }: { storeName?: string; 
           <div className="nav-right">
             <div className="search">
               <Search size={16} style={{ flexShrink: 0 }} />
-              <input placeholder="Search Netflix, ChatGPT…" />
+              <input
+                placeholder="Search Netflix, ChatGPT…"
+                value={searchQuery ?? ""}
+                onChange={(e) => onSearchQueryChange?.(e.target.value)}
+              />
             </div>
             <a className="iconbtn" aria-label="Account" href="/admin">
               <User size={18} />

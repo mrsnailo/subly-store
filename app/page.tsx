@@ -61,7 +61,7 @@ export default async function Home() {
         </div>
       )}
 
-      <SiteNav storeName={settings.storeName} logoUrl={settings.logoUrl} />
+
 
       {/* Hero */}
       <section className="hero">
