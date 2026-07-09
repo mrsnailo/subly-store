@@ -44,6 +44,9 @@ export function SettingsForm({ defaults }: { defaults: SettingsDefaults }) {
       if (res.ok && res.url) {
         setLogoUrl(res.url);
         setLogoStatus("success");
+        if (logoInputRef.current) {
+          logoInputRef.current.value = "";
+        }
       } else {
         throw new Error("Couldn't upload logo. Try again.");
       }
@@ -97,6 +100,9 @@ export function SettingsForm({ defaults }: { defaults: SettingsDefaults }) {
       if (res.ok && res.url) {
         setFaviconUrl(res.url);
         setFaviconStatus("success");
+        if (faviconInputRef.current) {
+          faviconInputRef.current.value = "";
+        }
       } else {
         throw new Error("Couldn't upload favicon. Try again.");
       }

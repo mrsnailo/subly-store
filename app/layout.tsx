@@ -43,9 +43,7 @@ export default async function RootLayout({
 }>) {
   const settings = await getStoreSettings();
 
-  const faviconUrl = settings.faviconUrl
-    ? `${settings.faviconUrl}?v=${settings.updatedAt.getTime()}`
-    : "/favicon.ico";
+  const faviconUrl = settings.faviconUrl || "/favicon.ico";
 
   return (
     <html lang="en">

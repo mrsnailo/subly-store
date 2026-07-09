@@ -4,7 +4,54 @@ import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { put, del } from "@vercel/blob";
+import { put as vercelPut, del as vercelDel } from "@vercel/blob";
+import fs from "fs";
+import path from "path";
+
+async function put(pathname: string, file: File, options?: any) {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    return vercelPut(pathname, file, options);
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  let filename = pathname;
+  const ext = path.extname(filename);
+  const base = path.basename(filename, ext);
+  if (options?.addRandomSuffix) {
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    filename = `uploads/${base}-${randomSuffix}${ext}`;
+  } else {
+    filename = `uploads/${base}${ext}`;
+  }
+  const destPath = path.join(process.cwd(), "public", filename);
+  fs.writeFileSync(destPath, buffer);
+  return { url: `/${filename}` };
+}
+
+async function del(url: string) {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    return vercelDel(url);
+  }
+  const cleanUrl = url.split("?")[0];
+  if (cleanUrl.startsWith("/uploads/")) {
+    const filePath = path.join(process.cwd(), "public", cleanUrl);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+}
+
+function canDelete(url: string) {
+  return url.startsWith("http") || url.startsWith("/uploads/");
+}
 
 async function requireAdmin() {
   const session = await auth();
@@ -43,12 +90,12 @@ export async function updateStoreSettings(formData: FormData) {
     const blob = await put("settings/logo.png", logoFile, {
       access: "public",
       allowOverwrite: true,
-      addRandomSuffix: false,
+      addRandomSuffix: true,
     });
     logoUrl = blob.url;
 
-    // Delete old logo blob if the extension changed
-    if (existing?.logoUrl && existing.logoUrl !== blob.url) {
+    // Delete old logo blob
+    if (existing?.logoUrl && canDelete(existing.logoUrl) && existing.logoUrl !== blob.url) {
       try { await del(existing.logoUrl); } catch { /* ignore */ }
     }
   }
@@ -59,11 +106,11 @@ export async function updateStoreSettings(formData: FormData) {
     const blob = await put("settings/favicon.png", faviconFile, {
       access: "public",
       allowOverwrite: true,
-      addRandomSuffix: false,
+      addRandomSuffix: true,
     });
     faviconUrl = blob.url;
 
-    if (existing?.faviconUrl && existing.faviconUrl !== blob.url) {
+    if (existing?.faviconUrl && canDelete(existing.faviconUrl) && existing.faviconUrl !== blob.url) {
       try { await del(existing.faviconUrl); } catch { /* ignore */ }
     }
   }
@@ -105,7 +152,7 @@ export async function uploadLogoAction(formData: FormData) {
   const blob = await put("settings/logo.png", file, {
     access: "public",
     allowOverwrite: true,
-    addRandomSuffix: false,
+    addRandomSuffix: true,
   });
 
   const existing = await prisma.storeSettings.findFirst({
@@ -113,10 +160,14 @@ export async function uploadLogoAction(formData: FormData) {
   });
 
   if (existing) {
+    const oldLogoUrl = existing.logoUrl;
     await prisma.storeSettings.update({
       where: { id: existing.id },
       data: { logoUrl: blob.url },
     });
+    if (oldLogoUrl && canDelete(oldLogoUrl) && oldLogoUrl !== blob.url) {
+      try { await del(oldLogoUrl); } catch { /* ignore */ }
+    }
   } else {
     await prisma.storeSettings.create({
       data: {
@@ -148,7 +199,7 @@ export async function uploadFaviconAction(formData: FormData) {
   const blob = await put("settings/favicon.png", file, {
     access: "public",
     allowOverwrite: true,
-    addRandomSuffix: false,
+    addRandomSuffix: true,
   });
 
   const existing = await prisma.storeSettings.findFirst({
@@ -156,10 +207,14 @@ export async function uploadFaviconAction(formData: FormData) {
   });
 
   if (existing) {
+    const oldFaviconUrl = existing.faviconUrl;
     await prisma.storeSettings.update({
       where: { id: existing.id },
       data: { faviconUrl: blob.url },
     });
+    if (oldFaviconUrl && canDelete(oldFaviconUrl) && oldFaviconUrl !== blob.url) {
+      try { await del(oldFaviconUrl); } catch { /* ignore */ }
+    }
   } else {
     await prisma.storeSettings.create({
       data: {
