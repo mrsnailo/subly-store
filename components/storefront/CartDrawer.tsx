@@ -76,15 +76,15 @@ export function CartDrawer({ isOpenStore = true, whatsApp = "+880" }: { isOpenSt
                 gap: "8px",
               }}
             >
-              <MessageCircle size={16} /> Order on WhatsApp
+              <MessageCircle size={16} aria-hidden="true" /> Order on WhatsApp
             </a>
           ) : (
             <button
               className="btn btn-ink"
               disabled
-              style={!isOpenStore ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+              style={{ opacity: 0.5, cursor: "not-allowed" }}
             >
-              {!isOpenStore ? "Store Closed" : "Checkout with bKash →"}
+              {!isOpenStore ? "Store Closed" : "Cart Empty"}
             </button>
           )}
           <p className="note">🔒 Secure · Replacement warranty on all plans</p>
