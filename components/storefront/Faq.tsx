@@ -14,7 +14,7 @@ const QA = [
   },
   {
     q: "What payment methods do you accept?",
-    a: "bKash, Nagad, Rocket, Upay, bank transfer, and international cards. Pay in BDT — no dollar card required.",
+    a: "bKash, Nagad, Rocket, Upay, and bank transfer. We confirm the order on WhatsApp and share payment details there. Pay in BDT.",
   },
   {
     q: "What if my subscription stops working?",

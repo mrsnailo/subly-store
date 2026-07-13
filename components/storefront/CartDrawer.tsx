@@ -1,9 +1,10 @@
 "use client";
 
 import { useCart } from "@/components/cart/CartProvider";
-import { bdt } from "@/lib/format";
+import { bdt, getWhatsAppLink, buildCartOrderMessage } from "@/lib/format";
+import { MessageCircle } from "lucide-react";
 
-export function CartDrawer({ isOpenStore = true }: { isOpenStore?: boolean }) {
+export function CartDrawer({ isOpenStore = true, whatsApp = "+880" }: { isOpenStore?: boolean; whatsApp?: string }) {
   const { items, subtotal, isOpen, closeCart, removeItem } = useCart();
 
   return (
@@ -61,13 +62,31 @@ export function CartDrawer({ isOpenStore = true }: { isOpenStore?: boolean }) {
             <span>Total</span>
             <span>{bdt(subtotal)}</span>
           </div>
-          <button
-            className="btn btn-ink"
-            disabled={items.length === 0 || !isOpenStore}
-            style={!isOpenStore ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
-          >
-            {isOpenStore ? "Checkout with bKash →" : "Store Closed"}
-          </button>
+          {isOpenStore && items.length > 0 ? (
+            <a
+              href={getWhatsAppLink(whatsApp, buildCartOrderMessage(items, subtotal))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ink"
+              style={{
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+            >
+              <MessageCircle size={16} /> Order on WhatsApp
+            </a>
+          ) : (
+            <button
+              className="btn btn-ink"
+              disabled
+              style={!isOpenStore ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+            >
+              {!isOpenStore ? "Store Closed" : "Checkout with bKash →"}
+            </button>
+          )}
           <p className="note">🔒 Secure · Replacement warranty on all plans</p>
         </div>
       </aside>

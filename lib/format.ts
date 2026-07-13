@@ -21,3 +21,17 @@ export function getWhatsAppLink(num: string, text?: string): string {
   }
   return `https://wa.me/${digits}`;
 }
+
+/** A cart line, structurally satisfied by CartItem. */
+export type OrderLine = { name: string; duration: string; price: number };
+
+/** Build the pre-filled WhatsApp order message for a whole cart. */
+export function buildCartOrderMessage(items: OrderLine[], subtotal: number): string {
+  const lines = [
+    "Hi! I'd like to order:",
+    ...items.map((item, i) => `${i + 1}. ${item.name} (${item.duration}) — ${bdt(item.price)}`),
+    "",
+    `Total: ${bdt(subtotal)}`,
+  ];
+  return lines.join("\n");
+}
