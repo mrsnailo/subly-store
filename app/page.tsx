@@ -449,7 +449,7 @@ export default async function Home() {
         </a>
       )}
 
-      <CartDrawer isOpenStore={settings.isOpen} />
+      <CartDrawer isOpenStore={settings.isOpen} whatsApp={settings.whatsApp} />
       <Toast />
     </>
   );
