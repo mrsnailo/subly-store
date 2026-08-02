@@ -6,8 +6,6 @@
 const REQUIRED_ENV_VARS = [
   "DATABASE_URL",
   "AUTH_SECRET",
-  "ADMIN_EMAIL",
-  "ADMIN_PASSWORD",
 ] as const;
 
 export function validateEnv() {

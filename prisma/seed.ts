@@ -85,12 +85,11 @@ function slugify(s: string) {
 }
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL;
-  const password = process.env.ADMIN_PASSWORD;
+  const email = process.env.ADMIN_EMAIL || "admin@subly.shop";
+  const password = process.env.ADMIN_PASSWORD || "admin123";
 
-  if (!email || !password) {
-    console.log("⚠ ADMIN_EMAIL / ADMIN_PASSWORD not set — skipping seed (expected in preview deploys)");
-    return;
+  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+    console.log("⚠ ADMIN_EMAIL or ADMIN_PASSWORD not set. Using default credentials.");
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
