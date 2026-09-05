@@ -33,7 +33,7 @@ export const authConfig: NextAuthConfig = {
 
       if (isOnLogin) {
         if (isLoggedIn) {
-          const dash = nextUrl.clone();
+          const dash = new URL(nextUrl.href);
           if (storeSlug && nextUrl.pathname.startsWith(`/${storeSlug}`)) {
             dash.pathname = `/${storeSlug}/admin`;
           } else {
@@ -46,7 +46,7 @@ export const authConfig: NextAuthConfig = {
       
       if (isOnAdmin) {
         if (!isLoggedIn) {
-          const loginUrl = nextUrl.clone();
+          const loginUrl = new URL(nextUrl.href);
           if (storeSlug && nextUrl.pathname.startsWith(`/${storeSlug}`)) {
             loginUrl.pathname = `/${storeSlug}/admin/login`;
           } else {
