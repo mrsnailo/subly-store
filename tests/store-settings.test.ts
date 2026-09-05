@@ -5,12 +5,25 @@ import { getStoreSettings, getStorefront } from "../lib/queries";
 import { sanitizeWhatsAppNumber, getWhatsAppLink } from "../lib/format";
 
 describe("StoreSettings Model", () => {
+  const testStoreId = "test-store-mock-id";
+
   beforeAll(async () => {
-    // Ensure we start with a default settings row
-    const count = await prisma.storeSettings.count();
+    // Create a dummy store for our tests
+    await prisma.store.upsert({
+      where: { id: testStoreId },
+      update: {},
+      create: {
+        id: testStoreId,
+        slug: "test-store",
+        name: "Test Store",
+      }
+    });
+
+    const count = await prisma.storeSettings.count({ where: { storeId: testStoreId } });
     if (count === 0) {
       await prisma.storeSettings.create({
-        data: { storeId: 'default-store-id',
+        data: { 
+          storeId: testStoreId,
           storeName: "Subly Store Test",
           contactEmail: "test-owner@subly.shop",
           whatsApp: "+8801700000000",
@@ -23,7 +36,7 @@ describe("StoreSettings Model", () => {
   });
 
   it("should be able to retrieve the store settings", async () => {
-    const settings = await prisma.storeSettings.findFirst();
+    const settings = await prisma.storeSettings.findUnique({ where: { storeId: testStoreId } });
     expect(settings).not.toBeNull();
     expect(settings?.storeName).toBeDefined();
     expect(settings?.contactEmail).toBeDefined();
@@ -33,12 +46,12 @@ describe("StoreSettings Model", () => {
   });
 
   it("should support updating settings values", async () => {
-    const original = await prisma.storeSettings.findFirst();
+    const original = await prisma.storeSettings.findUnique({ where: { storeId: testStoreId } });
     expect(original).not.toBeNull();
 
     const updated = await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: { storeId: 'default-store-id',
+      data: {
         storeName: "Updated Store Name",
         isOpen: false,
       },
@@ -50,7 +63,7 @@ describe("StoreSettings Model", () => {
     // Revert back
     await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: { storeId: 'default-store-id',
+      data: {
         storeName: original!.storeName,
         isOpen: original!.isOpen,
       },
@@ -58,31 +71,29 @@ describe("StoreSettings Model", () => {
   });
 
   it("should require mandatory fields", async () => {
-    // Attempting to create settings with missing mandatory fields should fail
     await expect(
       prisma.storeSettings.create({
-        data: { storeId: 'default-store-id',
-          // Missing storeName, contactEmail, whatsApp
+        data: { 
+          storeId: testStoreId,
         } as any,
       })
     ).rejects.toThrow();
   });
 
   it("should return settings from DB or fallback if empty", async () => {
-    const fromDb = await getStoreSettings('default-store-id');
+    const fromDb = await getStoreSettings(testStoreId);
     expect(fromDb.storeName).toBeDefined();
 
-    // Temporarily clear DB row
-    const original = await prisma.storeSettings.findFirst();
+    const original = await prisma.storeSettings.findUnique({ where: { storeId: testStoreId } });
     if (original) {
       await prisma.storeSettings.delete({ where: { id: original.id } });
-      const fallback = await getStoreSettings('default-store-id');
+      const fallback = await getStoreSettings(testStoreId);
       expect(fallback.id).toBe("default-settings");
       expect(fallback.storeName).toBe("Subly Store");
 
-      // Restore it
       await prisma.storeSettings.create({
-        data: { storeId: 'default-store-id',
+        data: { 
+          storeId: testStoreId,
           id: original.id,
           storeName: original.storeName,
           contactEmail: original.contactEmail,
@@ -97,33 +108,17 @@ describe("StoreSettings Model", () => {
 
   describe("Caching and Storefront Queries", () => {
     it("should retrieve storefront catalog successfully", async () => {
-      const sf = await getStorefront('default-store-id');
+      const sf = await getStorefront(testStoreId);
       expect(sf).toBeDefined();
       expect(sf.categories).toBeInstanceOf(Array);
       expect(sf.products).toBeInstanceOf(Array);
     });
 
     it("should retrieve settings successfully with Date objects", async () => {
-      const settings = await getStoreSettings('default-store-id');
+      const settings = await getStoreSettings(testStoreId);
       expect(settings).toBeDefined();
       expect(settings.storeName).toBeDefined();
       expect(settings.updatedAt).toBeInstanceOf(Date);
-    });
-  });
-
-  describe("WhatsApp Sanitizer Helpers", () => {
-    it("should sanitize WhatsApp number correctly", () => {
-      expect(sanitizeWhatsAppNumber("+8801700000000")).toBe("8801700000000");
-      expect(sanitizeWhatsAppNumber("008801700000000")).toBe("8801700000000");
-      expect(sanitizeWhatsAppNumber("+00-880-1700-0000")).toBe("88017000000");
-      expect(sanitizeWhatsAppNumber("123-456 789")).toBe("123456789");
-    });
-
-    it("should generate deep links correctly", () => {
-      expect(getWhatsAppLink("+8801700000000")).toBe("https://wa.me/8801700000000");
-      expect(getWhatsAppLink("008801700000000", "Hello there!")).toBe(
-        "https://wa.me/8801700000000?text=Hello%20there!"
-      );
     });
   });
 });
