@@ -2,16 +2,28 @@
 
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
+import { headers } from "next/headers";
+
+function getRedirectPath(basePath: string, storeSlug: string | null) {
+  if (storeSlug) return `/${storeSlug}${basePath}`;
+  return basePath;
+}
 
 export async function authenticate(
   _prev: string | undefined,
   formData: FormData,
 ): Promise<string | undefined> {
+  let storeSlug = null;
+  try {
+    const hdrs = await headers();
+    storeSlug = hdrs.get("x-store-slug");
+  } catch (e) {}
+
   try {
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      redirectTo: "/admin",
+      redirectTo: getRedirectPath("/admin", storeSlug),
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -36,5 +48,11 @@ export async function authenticate(
 }
 
 export async function logout() {
-  await signOut({ redirectTo: "/admin/login" });
+  let storeSlug = null;
+  try {
+    const hdrs = await headers();
+    storeSlug = hdrs.get("x-store-slug");
+  } catch (e) {}
+
+  await signOut({ redirectTo: getRedirectPath("/admin/login", storeSlug) });
 }

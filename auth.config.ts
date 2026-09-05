@@ -1,30 +1,62 @@
 import "@/lib/env";
 import type { NextAuthConfig } from "next-auth";
 
-/**
- * Edge-safe auth config (no Prisma / bcrypt imports), shared by the
- * middleware and the full server config. Route protection lives here.
- */
+function getStoreSlugAndPath(nextUrl: URL, host: string) {
+  const isAppDomain = host.startsWith("localhost:") || host.startsWith("127.0.0.1:") || host === "subly.store";
+  
+  if (!isAppDomain) {
+    const slug = host.split(".")[0];
+    return { storeSlug: slug, mappedPath: nextUrl.pathname };
+  } else {
+    const p1 = nextUrl.pathname.split("/")[1];
+    if (p1 && !["api", "_next", "create", "favicon.ico"].includes(p1)) {
+      let mappedPath = nextUrl.pathname.substring(p1.length + 1);
+      if (!mappedPath.startsWith("/")) mappedPath = "/" + mappedPath;
+      return { storeSlug: p1, mappedPath };
+    }
+  }
+  return { storeSlug: null, mappedPath: nextUrl.pathname };
+}
+
 export const authConfig: NextAuthConfig = {
   trustHost: true,
-  pages: {
-    signIn: "/admin/login",
-  },
-  providers: [], // real providers added in auth.ts (Node runtime)
+  providers: [],
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    authorized({ auth, request }) {
+      const { nextUrl } = request;
+      const host = request.headers.get("host") || "";
+      const { storeSlug, mappedPath } = getStoreSlugAndPath(nextUrl, host);
+
       const isLoggedIn = !!auth?.user;
-      const isOnAdmin = nextUrl.pathname.startsWith("/admin");
-      const isOnLogin = nextUrl.pathname === "/admin/login";
+      const isOnAdmin = mappedPath.startsWith("/admin");
+      const isOnLogin = mappedPath === "/admin/login";
 
       if (isOnLogin) {
-        // Already signed in? bounce to the dashboard.
         if (isLoggedIn) {
-          return Response.redirect(new URL("/admin", nextUrl));
+          const dash = nextUrl.clone();
+          if (storeSlug && nextUrl.pathname.startsWith(`/${storeSlug}`)) {
+            dash.pathname = `/${storeSlug}/admin`;
+          } else {
+            dash.pathname = `/admin`;
+          }
+          return Response.redirect(dash);
         }
         return true;
       }
-      if (isOnAdmin) return isLoggedIn; // gate the rest of /admin
+      
+      if (isOnAdmin) {
+        if (!isLoggedIn) {
+          const loginUrl = nextUrl.clone();
+          if (storeSlug && nextUrl.pathname.startsWith(`/${storeSlug}`)) {
+            loginUrl.pathname = `/${storeSlug}/admin/login`;
+          } else {
+            loginUrl.pathname = "/admin/login";
+          }
+          loginUrl.searchParams.set("callbackUrl", nextUrl.href);
+          return Response.redirect(loginUrl);
+        }
+        return true;
+      }
       return true;
     },
     jwt({ token, user }) {

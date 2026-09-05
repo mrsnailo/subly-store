@@ -11,19 +11,18 @@ const getStoreBySlug = unstable_cache(
 );
 
 export async function getCurrentStoreId(): Promise<string> {
-  let host = "";
+  let slug = "default";
   try {
     const hdrs = await headers();
-    host = hdrs.get("host") || "";
+    const explicitSlug = hdrs.get("x-store-slug");
+    if (explicitSlug) {
+      slug = explicitSlug;
+    } else {
+      // Fallback for direct /store1 path or where middleware didn't run? 
+      // Middleware should run for all non-static paths.
+    }
   } catch (e) {
-    // build time etc
-  }
-
-  // e.g. "my-store.subly.shop" -> "my-store", "localhost:3000" -> "localhost"
-  let slug = host.split(".")[0] || "default";
-  
-  if (host === "localhost" || host.startsWith("localhost:")) {
-    slug = "default";
+    // build time
   }
 
   const store = await getStoreBySlug(slug);
