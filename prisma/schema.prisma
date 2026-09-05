@@ -11,71 +11,102 @@ datasource db {
 }
 
 /// A single owner/admin account that can log into the admin panel.
+/// A single tenant (store) in the multi-tenant system.
+model Store {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  adminUsers    AdminUser[]
+  categories    Category[]
+  products      Product[]
+  durations     Duration[]
+  storeSettings StoreSettings[]
+}
+
 model AdminUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String  @id @default(cuid())
+  email        String  @unique
   name         String?
   passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  storeId      String
+  store        Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
 }
 
 /// Subscription category, e.g. "AI Tools", "Streaming". Owner can add / reorder.
 model Category {
   id        String    @id @default(cuid())
   name      String
-  slug      String    @unique
+  slug      String
   emoji     String? // optional icon shown on the pill
   coverKey  String? // optional category cover key matching local SVG asset
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
   products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  storeId   String
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, slug])
   @@index([sortOrder])
 }
 
 /// A purchasable subscription product belonging to a category.
 model Product {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   name       String
-  slug       String   @unique
+  slug       String
   tagline    String // short descriptor, e.g. "GPT-4o · DALL·E · advanced"
   wordmark   String // brand wordmark text shown on the card
-  brandColor String   @default("#14151A") // wordmark colour
-  brandBg    String   @default("#EDEAE1") // card header background
-  rating     Float    @default(4.8)
+  brandColor String  @default("#14151A") // wordmark colour
+  brandBg    String  @default("#EDEAE1") // card header background
+  rating     Float   @default(4.8)
   badgeText  String? // e.g. "Hot", "-50%"
   badgeKind  String? // "hot" | "save"
-  isFeatured Boolean  @default(false)
-  isActive   Boolean  @default(true)
-  sortOrder  Int      @default(0)
+  isFeatured Boolean @default(false)
+  isActive   Boolean @default(true)
+  sortOrder  Int     @default(0)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   durations Duration[]
 
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([storeId, slug])
   @@index([categoryId])
   @@index([sortOrder])
 }
 
 /// A price tier for a product: a duration label with current and optional "was" price (BDT).
 model Duration {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   label     String // e.g. "1 mo", "3 mo", "1 yr"
   price     Int // current price in BDT (whole taka)
   wasPrice  Int? // optional strike-through price
-  sortOrder Int     @default(0)
+  sortOrder Int    @default(0)
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storeId   String
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([productId])
+  @@index([storeId])
 }
 
 /// Tracks admin login attempts for brute-force protection/rate-limiting.
@@ -92,16 +123,19 @@ model LoginAttempt {
 
 /// Global store settings (single-row settings model).
 model StoreSettings {
-  id           String   @id @default(cuid())
+  id           String  @id @default(cuid())
   storeName    String
   contactEmail String
   whatsApp     String
-  currency     String   @default("BDT")
+  currency     String  @default("BDT")
   logoUrl      String? // logo reference — Vercel Blob URL
   faviconUrl   String? // favicon reference — Vercel Blob URL
-  isOpen       Boolean  @default(true) // open/closed flag
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isOpen       Boolean @default(true) // open/closed flag
+  storeId      String  @unique
+  store        Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
 }
-
-

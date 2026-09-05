@@ -13,3 +13,15 @@ if (!process.env.DATABASE_URL) {
       "Do not run `npm test`/`vitest` directly on a fresh clone.",
   );
 }
+
+import { prisma } from "../lib/prisma";
+
+import { beforeAll } from "vitest";
+
+beforeAll(async () => {
+  await prisma.store.upsert({
+    where: { id: "default-store-id" },
+    update: {},
+    create: { id: "default-store-id", slug: "default", name: "Default Store" }
+  });
+});

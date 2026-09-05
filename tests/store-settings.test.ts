@@ -10,7 +10,7 @@ describe("StoreSettings Model", () => {
     const count = await prisma.storeSettings.count();
     if (count === 0) {
       await prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           storeName: "Subly Store Test",
           contactEmail: "test-owner@subly.shop",
           whatsApp: "+8801700000000",
@@ -38,7 +38,7 @@ describe("StoreSettings Model", () => {
 
     const updated = await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: {
+      data: { storeId: 'default-store-id',
         storeName: "Updated Store Name",
         isOpen: false,
       },
@@ -50,7 +50,7 @@ describe("StoreSettings Model", () => {
     // Revert back
     await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: {
+      data: { storeId: 'default-store-id',
         storeName: original!.storeName,
         isOpen: original!.isOpen,
       },
@@ -61,7 +61,7 @@ describe("StoreSettings Model", () => {
     // Attempting to create settings with missing mandatory fields should fail
     await expect(
       prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           // Missing storeName, contactEmail, whatsApp
         } as any,
       })
@@ -82,7 +82,7 @@ describe("StoreSettings Model", () => {
 
       // Restore it
       await prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           id: original.id,
           storeName: original.storeName,
           contactEmail: original.contactEmail,

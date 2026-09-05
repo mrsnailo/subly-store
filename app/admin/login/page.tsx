@@ -1,3 +1,4 @@
+import { getCurrentStoreId } from "@/lib/current-store";
 import { LoginForm } from "./LoginForm";
 import { getStoreSettings } from "@/lib/queries";
 import { Logo } from "@/components/Logo";
@@ -9,7 +10,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getStoreSettings();
+  const settings = await getStoreSettings(await getCurrentStoreId());
   return {
     metadataBase: new URL(SITE_URL),
     title: `Admin · ${settings.storeName}`,
@@ -18,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LoginPage() {
-  const settings = await getStoreSettings();
+  const settings = await getStoreSettings(await getCurrentStoreId());
 
   return (
     <div className="auth-wrap">

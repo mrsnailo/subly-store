@@ -14,8 +14,15 @@ async function main() {
   // Ensure default store settings exist even if full seed is skipped
   const settingsCount = await prisma.storeSettings.count();
   if (settingsCount === 0) {
+    
+    const store = await prisma.store.upsert({
+      where: { slug: 'default' },
+      update: {},
+      create: { slug: 'default', name: 'Default Store' }
+    });
     await prisma.storeSettings.create({
-      data: {
+        data: {
+          storeId: store.id,
         storeName: "Subly Store",
         contactEmail: "owner@subly.shop",
         whatsApp: "+8801700000000",

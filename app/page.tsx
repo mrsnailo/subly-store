@@ -1,3 +1,4 @@
+import { getCurrentStoreId } from "@/lib/current-store";
 import { SiteNav } from "@/components/storefront/SiteNav";
 import { Shop } from "@/components/storefront/Shop";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
@@ -11,8 +12,8 @@ import { Star, Zap, ShieldCheck, CreditCard, MessageCircle, ArrowRight } from "l
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export default async function Home() {
-  const { categories, products } = await getStorefront();
-  const settings = await getStoreSettings();
+  const { categories, products } = await getStorefront(await getCurrentStoreId());
+  const settings = await getStoreSettings(await getCurrentStoreId());
   const serviceCount = products.length;
 
   const orgLd = {

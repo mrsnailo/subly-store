@@ -1,3 +1,4 @@
+import { getCurrentStoreId } from "@/lib/current-store";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/admin/Sidebar";
@@ -13,7 +14,7 @@ export default async function PanelLayout({
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
 
-  const settings = await getStoreSettings();
+  const settings = await getStoreSettings((session.user as any).storeId as string);
 
   return (
     <div className="admin-shell">

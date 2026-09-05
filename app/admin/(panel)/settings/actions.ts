@@ -55,7 +55,8 @@ function canDelete(url: string) {
 
 async function requireAdmin() {
   const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
+  if (!session?.user || !(session.user as any).storeId) throw new Error("Unauthorized");
+  return { ...session.user, storeId: (session.user as any).storeId as string };
 }
 
 const settingsSchema = z.object({
@@ -66,8 +67,15 @@ const settingsSchema = z.object({
   isOpen: z.boolean(),
 });
 
+function revalidate(storeId: string) {
+  revalidateTag(`store-settings-${storeId}`, { expire: 0 } as any);
+  revalidateTag(`storefront-${storeId}`, { expire: 0 } as any);
+  revalidatePath("/");
+  revalidatePath("/admin/settings");
+}
+
 export async function updateStoreSettings(formData: FormData) {
-  await requireAdmin();
+  const { storeId } = await requireAdmin();
 
   const data = settingsSchema.parse({
     storeName: formData.get("storeName"),
@@ -77,8 +85,8 @@ export async function updateStoreSettings(formData: FormData) {
     isOpen: formData.get("isOpen") === "on",
   });
 
-  const existing = await prisma.storeSettings.findFirst({
-    orderBy: { createdAt: "asc" },
+  const existing = await prisma.storeSettings.findUnique({
+    where: { storeId },
   });
 
   let logoUrl = existing?.logoUrl ?? "/logo.svg";
@@ -87,7 +95,7 @@ export async function updateStoreSettings(formData: FormData) {
   // Handle Logo Upload
   const logoFile = formData.get("logo") as File | null;
   if (logoFile && logoFile.size > 0) {
-    const blob = await put("settings/logo.png", logoFile, {
+    const blob = await put(`settings/${storeId}-logo.png`, logoFile, {
       access: "public",
       allowOverwrite: true,
       addRandomSuffix: true,
@@ -103,7 +111,7 @@ export async function updateStoreSettings(formData: FormData) {
   // Handle Favicon Upload
   const faviconFile = formData.get("favicon") as File | null;
   if (faviconFile && faviconFile.size > 0) {
-    const blob = await put("settings/favicon.png", faviconFile, {
+    const blob = await put(`settings/${storeId}-favicon.png`, faviconFile, {
       access: "public",
       allowOverwrite: true,
       addRandomSuffix: true,
@@ -117,7 +125,7 @@ export async function updateStoreSettings(formData: FormData) {
 
   if (existing) {
     await prisma.storeSettings.update({
-      where: { id: existing.id },
+      where: { storeId },
       data: {
         ...data,
         logoUrl,
@@ -128,41 +136,38 @@ export async function updateStoreSettings(formData: FormData) {
     await prisma.storeSettings.create({
       data: {
         ...data,
+        storeId,
         logoUrl,
         faviconUrl,
       },
     });
   }
 
-  revalidateTag("store-settings", { expire: 0 });
-  revalidateTag("storefront", { expire: 0 });
-  revalidatePath("/");
-  revalidatePath("/admin/settings");
-
+  revalidate(storeId);
   return { ok: true } as const;
 }
 
 export async function uploadLogoAction(formData: FormData) {
-  await requireAdmin();
+  const { storeId } = await requireAdmin();
   const file = formData.get("logo") as File | null;
   if (!file || file.size === 0) {
     throw new Error("No file uploaded");
   }
 
-  const blob = await put("settings/logo.png", file, {
+  const blob = await put(`settings/${storeId}-logo.png`, file, {
     access: "public",
     allowOverwrite: true,
     addRandomSuffix: true,
   });
 
-  const existing = await prisma.storeSettings.findFirst({
-    orderBy: { createdAt: "asc" },
+  const existing = await prisma.storeSettings.findUnique({
+    where: { storeId },
   });
 
   if (existing) {
     const oldLogoUrl = existing.logoUrl;
     await prisma.storeSettings.update({
-      where: { id: existing.id },
+      where: { storeId },
       data: { logoUrl: blob.url },
     });
     if (oldLogoUrl && canDelete(oldLogoUrl) && oldLogoUrl !== blob.url) {
@@ -171,6 +176,7 @@ export async function uploadLogoAction(formData: FormData) {
   } else {
     await prisma.storeSettings.create({
       data: {
+        storeId,
         storeName: "Subly Store",
         contactEmail: "owner@subly.shop",
         whatsApp: "+880",
@@ -181,35 +187,31 @@ export async function uploadLogoAction(formData: FormData) {
     });
   }
 
-  revalidateTag("store-settings", { expire: 0 });
-  revalidateTag("storefront", { expire: 0 });
-  revalidatePath("/");
-  revalidatePath("/admin/settings");
-
+  revalidate(storeId);
   return { ok: true, url: blob.url };
 }
 
 export async function uploadFaviconAction(formData: FormData) {
-  await requireAdmin();
+  const { storeId } = await requireAdmin();
   const file = formData.get("favicon") as File | null;
   if (!file || file.size === 0) {
     throw new Error("No file uploaded");
   }
 
-  const blob = await put("settings/favicon.png", file, {
+  const blob = await put(`settings/${storeId}-favicon.png`, file, {
     access: "public",
     allowOverwrite: true,
     addRandomSuffix: true,
   });
 
-  const existing = await prisma.storeSettings.findFirst({
-    orderBy: { createdAt: "asc" },
+  const existing = await prisma.storeSettings.findUnique({
+    where: { storeId },
   });
 
   if (existing) {
     const oldFaviconUrl = existing.faviconUrl;
     await prisma.storeSettings.update({
-      where: { id: existing.id },
+      where: { storeId },
       data: { faviconUrl: blob.url },
     });
     if (oldFaviconUrl && canDelete(oldFaviconUrl) && oldFaviconUrl !== blob.url) {
@@ -218,6 +220,7 @@ export async function uploadFaviconAction(formData: FormData) {
   } else {
     await prisma.storeSettings.create({
       data: {
+        storeId,
         storeName: "Subly Store",
         contactEmail: "owner@subly.shop",
         whatsApp: "+880",
@@ -228,10 +231,6 @@ export async function uploadFaviconAction(formData: FormData) {
     });
   }
 
-  revalidateTag("store-settings", { expire: 0 });
-  revalidateTag("storefront", { expire: 0 });
-  revalidatePath("/");
-  revalidatePath("/admin/settings");
-
+  revalidate(storeId);
   return { ok: true, url: blob.url };
 }

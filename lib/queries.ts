@@ -32,14 +32,14 @@ export type StoreCategory = {
 };
 
 /** Raw database query for storefront. */
-const fetchStorefront = async () => {
+const fetchStorefront = async (storeId: string) => {
   try {
     const categories = await prisma.category.findMany({
-      where: { isActive: true },
+      where: { storeId, isActive: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: {
         products: {
-          where: { isActive: true },
+          where: { storeId, isActive: true },
           orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
           include: { durations: { orderBy: { sortOrder: "asc" } } },
         },
@@ -85,21 +85,21 @@ const fetchStorefront = async () => {
 };
 
 /** Cache storefront data across requests using Next.js unstable_cache. */
-const getCachedStorefront = unstable_cache(
-  async () => fetchStorefront(),
-  ["storefront-data"],
-  { tags: ["storefront"] }
-);
+const getCachedStorefront = (storeId: string) => unstable_cache(
+  async () => fetchStorefront(storeId),
+  [`storefront-data-${storeId}`],
+  { tags: [`storefront-${storeId}`] }
+)();
 
 /** Active categories (ordered) + active products with their price tiers, for the storefront.
  * Bypasses both React cache and Next.js unstable_cache in Vitest environment.
  */
 export const getStorefront = (process.env.VITEST === "true" || process.env.NODE_ENV === "test")
-  ? async () => {
-      return fetchStorefront();
+  ? async (storeId: string) => {
+      return fetchStorefront(storeId);
     }
-  : cache(async () => {
-      return getCachedStorefront();
+  : cache(async (storeId: string) => {
+      return getCachedStorefront(storeId);
     });
 
 export type StoreSettings = {
@@ -119,10 +119,10 @@ type SerializedStoreSettings = Omit<StoreSettings, "updatedAt"> & {
 };
 
 /** Raw database query for store settings. */
-const fetchStoreSettings = async (): Promise<SerializedStoreSettings> => {
+const fetchStoreSettings = async (storeId: string): Promise<SerializedStoreSettings> => {
   try {
-    const settings = await prisma.storeSettings.findFirst({
-      orderBy: { createdAt: "asc" },
+    const settings = await prisma.storeSettings.findUnique({
+      where: { storeId },
     });
     if (settings) {
       const ts = settings.updatedAt.getTime();
@@ -155,26 +155,26 @@ const fetchStoreSettings = async (): Promise<SerializedStoreSettings> => {
 };
 
 /** Cache settings data across requests using Next.js unstable_cache. */
-const getCachedStoreSettings = unstable_cache(
-  async () => fetchStoreSettings(),
-  ["store-settings-data"],
-  { tags: ["store-settings"] }
-);
+const getCachedStoreSettings = (storeId: string) => unstable_cache(
+  async () => fetchStoreSettings(storeId),
+  [`store-settings-data-${storeId}`],
+  { tags: [`store-settings-${storeId}`] }
+)();
 
 /** Get global store settings.
  * Deserializes updatedAt string back into a Date object.
  * Bypasses both React cache and Next.js unstable_cache in Vitest environment.
  */
 export const getStoreSettings = (process.env.VITEST === "true" || process.env.NODE_ENV === "test")
-  ? async (): Promise<StoreSettings> => {
-      const settings = await fetchStoreSettings();
+  ? async (storeId: string): Promise<StoreSettings> => {
+      const settings = await fetchStoreSettings(storeId);
       return {
         ...settings,
         updatedAt: new Date(settings.updatedAt),
       };
     }
-  : cache(async (): Promise<StoreSettings> => {
-      const settings = await getCachedStoreSettings();
+  : cache(async (storeId: string): Promise<StoreSettings> => {
+      const settings = await getCachedStoreSettings(storeId);
       return {
         ...settings,
         updatedAt: new Date(settings.updatedAt),

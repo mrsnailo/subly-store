@@ -83,5 +83,5 @@ export async function authorizeCredentials(raw: unknown) {
     data: { ip, email, success: true },
   });
 
-  return { id: user.id, email: user.email, name: user.name ?? "Owner" };
+  return { id: user.id, email: user.email, name: user.name ?? "Owner", storeId: user.storeId };
 }
