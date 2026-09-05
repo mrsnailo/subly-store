@@ -39,7 +39,7 @@ describe("Category Cover System", () => {
   });
 
   describe("Prisma & Queries Integration", () => {
-    it("should persist coverKey and return it via getStorefront()", async () => {
+    it("should persist coverKey and return it via getStorefront('default-store-id')", async () => {
       // 1. Create a category with a coverKey
       const cat = await prisma.category.create({
         data: { storeId: 'default-store-id',
@@ -53,7 +53,7 @@ describe("Category Cover System", () => {
       expect(cat.coverKey).toBe("ai");
 
       // 2. Retrieve storefront
-      const sf = await getStorefront();
+      const sf = await getStorefront('default-store-id');
       const testCat = sf.categories.find((c) => c.id === cat.id);
       expect(testCat).toBeDefined();
       expect(testCat?.coverKey).toBe("ai");

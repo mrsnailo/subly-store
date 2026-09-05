@@ -69,14 +69,14 @@ describe("StoreSettings Model", () => {
   });
 
   it("should return settings from DB or fallback if empty", async () => {
-    const fromDb = await getStoreSettings();
+    const fromDb = await getStoreSettings('default-store-id');
     expect(fromDb.storeName).toBeDefined();
 
     // Temporarily clear DB row
     const original = await prisma.storeSettings.findFirst();
     if (original) {
       await prisma.storeSettings.delete({ where: { id: original.id } });
-      const fallback = await getStoreSettings();
+      const fallback = await getStoreSettings('default-store-id');
       expect(fallback.id).toBe("default-settings");
       expect(fallback.storeName).toBe("Subly Store");
 
@@ -97,14 +97,14 @@ describe("StoreSettings Model", () => {
 
   describe("Caching and Storefront Queries", () => {
     it("should retrieve storefront catalog successfully", async () => {
-      const sf = await getStorefront();
+      const sf = await getStorefront('default-store-id');
       expect(sf).toBeDefined();
       expect(sf.categories).toBeInstanceOf(Array);
       expect(sf.products).toBeInstanceOf(Array);
     });
 
     it("should retrieve settings successfully with Date objects", async () => {
-      const settings = await getStoreSettings();
+      const settings = await getStoreSettings('default-store-id');
       expect(settings).toBeDefined();
       expect(settings.storeName).toBeDefined();
       expect(settings.updatedAt).toBeInstanceOf(Date);
