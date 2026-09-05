@@ -27,7 +27,7 @@ describe("Brute force protection & Rate Limiting", () => {
     await prisma.adminUser.upsert({
       where: { email: testEmail },
       update: { passwordHash },
-      create: {
+      create: { storeId: 'default-store-id',
         email: testEmail,
         passwordHash,
         name: "Test Admin",

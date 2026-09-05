@@ -1,3 +1,4 @@
+import { getCurrentStoreId } from "@/lib/current-store";
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/CartProvider";
@@ -7,7 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getStoreSettings();
+  const settings = await getStoreSettings(await getCurrentStoreId());
 
   const base = new URL(SITE_URL);
   const title = `${settings.storeName} — Premium Digital Subscriptions`;
@@ -41,7 +42,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getStoreSettings();
+  const settings = await getStoreSettings(await getCurrentStoreId());
 
   const faviconUrl = settings.faviconUrl || "/favicon.ico";
 

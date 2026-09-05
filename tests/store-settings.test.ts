@@ -10,7 +10,7 @@ describe("StoreSettings Model", () => {
     const count = await prisma.storeSettings.count();
     if (count === 0) {
       await prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           storeName: "Subly Store Test",
           contactEmail: "test-owner@subly.shop",
           whatsApp: "+8801700000000",
@@ -38,7 +38,7 @@ describe("StoreSettings Model", () => {
 
     const updated = await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: {
+      data: { storeId: 'default-store-id',
         storeName: "Updated Store Name",
         isOpen: false,
       },
@@ -50,7 +50,7 @@ describe("StoreSettings Model", () => {
     // Revert back
     await prisma.storeSettings.update({
       where: { id: original!.id },
-      data: {
+      data: { storeId: 'default-store-id',
         storeName: original!.storeName,
         isOpen: original!.isOpen,
       },
@@ -61,7 +61,7 @@ describe("StoreSettings Model", () => {
     // Attempting to create settings with missing mandatory fields should fail
     await expect(
       prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           // Missing storeName, contactEmail, whatsApp
         } as any,
       })
@@ -69,20 +69,20 @@ describe("StoreSettings Model", () => {
   });
 
   it("should return settings from DB or fallback if empty", async () => {
-    const fromDb = await getStoreSettings();
+    const fromDb = await getStoreSettings('default-store-id');
     expect(fromDb.storeName).toBeDefined();
 
     // Temporarily clear DB row
     const original = await prisma.storeSettings.findFirst();
     if (original) {
       await prisma.storeSettings.delete({ where: { id: original.id } });
-      const fallback = await getStoreSettings();
+      const fallback = await getStoreSettings('default-store-id');
       expect(fallback.id).toBe("default-settings");
       expect(fallback.storeName).toBe("Subly Store");
 
       // Restore it
       await prisma.storeSettings.create({
-        data: {
+        data: { storeId: 'default-store-id',
           id: original.id,
           storeName: original.storeName,
           contactEmail: original.contactEmail,
@@ -97,14 +97,14 @@ describe("StoreSettings Model", () => {
 
   describe("Caching and Storefront Queries", () => {
     it("should retrieve storefront catalog successfully", async () => {
-      const sf = await getStorefront();
+      const sf = await getStorefront('default-store-id');
       expect(sf).toBeDefined();
       expect(sf.categories).toBeInstanceOf(Array);
       expect(sf.products).toBeInstanceOf(Array);
     });
 
     it("should retrieve settings successfully with Date objects", async () => {
-      const settings = await getStoreSettings();
+      const settings = await getStoreSettings('default-store-id');
       expect(settings).toBeDefined();
       expect(settings.storeName).toBeDefined();
       expect(settings.updatedAt).toBeInstanceOf(Date);

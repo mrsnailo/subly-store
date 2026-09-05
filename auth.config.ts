@@ -28,11 +28,15 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.storeId = (user as any).storeId;
+      }
       return token;
     },
     session({ session, token }) {
       if (token.id && session.user) {
+        (session.user as any).storeId = token.storeId;
         session.user.id = token.id as string;
       }
       return session;

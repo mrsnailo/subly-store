@@ -85,6 +85,12 @@ function slugify(s: string) {
 }
 
 async function main() {
+  const store = await prisma.store.upsert({
+    where: { slug: 'default' },
+    update: {},
+    create: { slug: 'default', name: 'Default Store' }
+  });
+
   const email = process.env.ADMIN_EMAIL || "admin@subly.shop";
   const password = process.env.ADMIN_PASSWORD || "admin123";
 
@@ -95,16 +101,17 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.adminUser.upsert({
     where: { email },
-    update: { passwordHash, name: "Subly Owner" },
-    create: { email, passwordHash, name: "Subly Owner" },
+    update: { passwordHash, name: "Subly Owner", storeId: store.id },
+    create: { email, passwordHash, name: "Subly Owner", storeId: store.id },
   });
   console.log(`✓ Admin user ready: ${email}`);
 
   // ── Store settings ──
-  const settingsCount = await prisma.storeSettings.count();
+  const settingsCount = await prisma.storeSettings.count({ where: { storeId: store.id } });
   if (settingsCount === 0) {
     await prisma.storeSettings.create({
       data: {
+        storeId: store.id,
         storeName: "Subly Store",
         contactEmail: "owner@subly.shop",
         whatsApp: "+8801700000000",
@@ -120,20 +127,21 @@ async function main() {
 
   // ── Categories + products + durations ──
   // Clear product graph for a clean re-seed (leaves admin user intact).
-  await prisma.duration.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
+  await prisma.duration.deleteMany({ where: { storeId: store.id } });
+  await prisma.product.deleteMany({ where: { storeId: store.id } });
+  await prisma.category.deleteMany({ where: { storeId: store.id } });
 
   let catOrder = 0;
   for (const cat of CATEGORIES) {
     const category = await prisma.category.create({
-      data: { name: cat.name, slug: cat.slug, emoji: cat.emoji, coverKey: cat.coverKey, sortOrder: catOrder++ },
+      data: { storeId: store.id, name: cat.name, slug: cat.slug, emoji: cat.emoji, coverKey: cat.coverKey, sortOrder: catOrder++ },
     });
 
     let prodOrder = 0;
     for (const p of cat.products) {
       await prisma.product.create({
         data: {
+          storeId: store.id,
           name: p.name,
           slug: slugify(p.name),
           tagline: p.tagline,
@@ -148,6 +156,7 @@ async function main() {
           categoryId: category.id,
           durations: {
             create: p.durations.map((d, i) => ({
+              storeId: store.id,
               label: d.label,
               price: d.price,
               wasPrice: d.wasPrice ?? null,
